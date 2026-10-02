@@ -30,7 +30,8 @@
       --score-loss: #c8102e;
       --score-draw: #1a56c4;
       --side-home: #1b7d38;
-      --side-away: #8a6230;
+      /* Синий для выездных матчей на светлом фоне. */
+      --side-away: #245b9e;
       --outside: #e7f3ff;
       --outside-num: #7a98b8;
       --match: #ffffff;
@@ -39,6 +40,9 @@
       --site-font: Roboto, sans-serif;
     }
     html[data-theme="dark"] {
+      /* Светлые оттенки делают названия футбола и хоккея читаемыми на тёмных карточках. */
+      --football: #f06c81;
+      --hockey: #78aee8;
       color-scheme: dark;
       --bg: #090e15;
       --ink: #e7eef8;
@@ -51,7 +55,8 @@
       --score-loss: #ff6d6d;
       --score-draw: #7eb0ff;
       --side-home: #4dce74;
-      --side-away: #e2b07a;
+      /* Более светлый синий сохраняет читаемость выездов в тёмной теме. */
+      --side-away: #8bbcff;
       --outside: #070b11;
       --outside-num: #6e88a8;
       --match: #172331;
@@ -237,7 +242,20 @@
       text-align: center;
       white-space: nowrap;
     }
-    .nav h2 { margin: 0; font-size: 22px; text-transform: uppercase; }
+    /* Текущий месяц и год в плашке того же стиля, что и кнопки переключения. */
+    .nav h2 {
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      margin: 0;
+      /* Небольшая оптическая поправка центрирует заглавные буквы по высоте. */
+      padding: 2px 14px 0;
+      border-radius: 999px;
+      background: var(--nav-btn);
+      color: var(--ink);
+      font-size: 22px;
+      text-transform: uppercase;
+    }
     .months button, #refresh {
       height: 36px;
       padding: 0 14px;
@@ -246,7 +264,10 @@
       border-color: var(--nav-btn);
       color: var(--ink);
     }
-    .months button { text-transform: capitalize; }
+    /* Контурные стрелки переключения месяцев в прежних округлых плашках. */
+    .months button { display: inline-flex; align-items: center; justify-content: center; width: 40px; flex: none; padding: 0; }
+    .months button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+    #prev svg { transform: rotate(180deg); }
     #refresh:disabled { opacity: 0.6; cursor: default; }
     .wrap { overflow-x: auto; }
     .grid {
@@ -272,6 +293,8 @@
       .months { gap: 8px; }
       .nav h2 { white-space: nowrap; }
       .filters, .nav-actions { justify-self: center; }
+      /* При прокрутке оставляем в панели фильтры и месяц, скрывая ряд действий. */
+      .nav.is-scrolled .nav-actions { display: none; }
       #updated { white-space: normal; }
       .weekday { display: none; }
       .grid { grid-template-columns: 1fr; }
@@ -299,7 +322,8 @@
     }
     .cell.outside .daynum { color: var(--outside-num); font-weight: 600; }
     .cell.outside .match { opacity: 0.55; }
-    .cell.today .daynum { outline: 2px solid var(--red); }
+    /* Рамка текущего дня закруглена сверху и снизу на всех экранах. */
+    .cell.today .daynum { outline: 2px solid var(--red); border-radius: 7px; }
     .daynum {
       display: flex;
       align-items: center;
@@ -336,20 +360,21 @@
       }
     }
     .match {
-      --match-line-gap: 14.4px;
+      --match-line-gap: 7.2px;
       display: block;
       position: relative;
       text-decoration: none;
       color: inherit;
-      border-left: 3px solid var(--football);
       background: var(--match);
       border-radius: 4px;
       padding: 4px 36px 5px 6px;
       margin-top: 4px;
     }
     .match.local { background: var(--local); }
-    .match.hockey { border-left-color: var(--hockey); }
-    .match.basketball { border-left-color: var(--basketball); }
+    /* Цвет вида спорта перенесён с левой полосы на его название. */
+    .match.football .sport { color: var(--football); }
+    .match.hockey .sport { color: var(--hockey); }
+    .match.basketball .sport { color: var(--basketball); }
     .match .sport {
       flex: none;
       margin-left: auto;
@@ -387,9 +412,26 @@
       overflow: hidden;
     }
     /* Счёт жирный и на 2 px крупнее основного текста с названием соперника. */
-    .match .score { font-size: 15px; font-weight: 700; line-height: 1.2; height: 1.2em; }
+    .match .score {
+      /* Ширина зависит от счёта; равные боковые отступы и оптическая поправка вниз. */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-width: 100%;
+      text-align: center;
+      white-space: nowrap;
+      padding: 4px 9px 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
     .match .score-pending { color: var(--muted); }
-    /* Пустая строка после «Дома/Выезд» и перед соревнованием на всех экранах. */
+    /* Половина строки после места проведения и перед соревнованием на всех экранах. */
     .match > .sub, .match > .foot {
       margin-top: var(--match-line-gap);
     }
@@ -442,12 +484,12 @@
     .score-loss { color: var(--score-loss); }
     .score-draw { color: var(--score-draw); }
     @media (max-width: 760px) {
-      /* Удваиваем шрифт карточек; высота и переносы сохраняют весь крупный текст. */
-      .match { --match-line-gap: 28.8px; }
-      .match .opp { font-size: 26px; }
-      .match .score { font-size: 28px; }
-      .match .side, .match .sub, .match .club-place, .match .time { font-size: 24px; }
-      .match .comp, .match .sport { font-size: 22px; }
+      /* Шрифт в 1,5 раза крупнее исходного; счёт дополнительно увеличен на 2 px. */
+      .match { --match-line-gap: 10.8px; }
+      .match .opp { font-size: 19.5px; }
+      .match .score { font-size: 21.5px; }
+      .match .side, .match .sub, .match .club-place, .match .time { font-size: 18px; }
+      .match .comp, .match .sport { font-size: 16.5px; }
       .match .title, .match .opp, .match .score, .match .side,
       .match .sub, .match .club-place, .match .time, .match .foot {
         height: auto;
@@ -459,12 +501,12 @@
         white-space: normal;
         overflow: visible;
       }
-      /* Дата и эмблема вдвое крупнее; оставляем место для эмблемы рядом с названием. */
-      .daynum { font-size: 24px; }
+      /* Дата крупнее в 1,5 раза; сохраняем увеличенные эмблемы и место рядом с ними. */
+      .daynum { font-size: 18px; }
       .match .icon { width: 56px; height: 56px; }
       .match .icon img { height: 56px; }
-      .match .title { min-height: 91.2px; padding-right: 28px; }
-      .match > .side, .match > .time { margin-top: 6px; }
+      .match .title { min-height: 68.4px; padding-right: 28px; }
+      .match > .side, .match > .time { margin-top: 4.5px; }
       .match .foot { flex-wrap: wrap; gap: 6px 12px; }
     }
     footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
@@ -500,9 +542,9 @@
       </div>
       <div class="month-block">
         <div class="months">
-          <button type="button" id="prev">← месяц</button>
+          <button type="button" id="prev" aria-label="Предыдущий месяц"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 3h7l11 11-11 11H5l11-11Z"/></svg></button>
           <h2 id="label"></h2>
-          <button type="button" id="next">месяц →</button>
+          <button type="button" id="next" aria-label="Следующий месяц"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 3h7l11 11-11 11H5l11-11Z"/></svg></button>
         </div>
         <p id="updated">Загрузка…</p>
       </div>
@@ -538,6 +580,16 @@
     let matches = [];
     let cursor = todayParts();
 
+    const navigation = document.querySelector(".nav");
+    function updateNavigation() {
+      // Разные пороги скрытия и возврата предотвращают дрожание при изменении высоты панели.
+      if (window.scrollY > 180) navigation.classList.add("is-scrolled");
+      else if (window.scrollY < 60) navigation.classList.remove("is-scrolled");
+    }
+    window.addEventListener("scroll", updateNavigation, { passive: true });
+    window.addEventListener("pageshow", updateNavigation);
+    updateNavigation();
+
     const themeButton = document.getElementById("theme");
     applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
     themeButton.addEventListener("click", () => {
@@ -563,7 +615,11 @@
           matches = payload.matches || [];
           const updated = payload.updated_at ? new Date(payload.updated_at) : null;
           document.getElementById("updated").textContent = updated
-            ? "Обновлено " + updated.toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })
+            ? "Обновлено " + updated.toLocaleString("ru-RU", {
+              timeZone: "Europe/Moscow",
+              day: "2-digit", month: "2-digit", year: "numeric",
+              hour: "2-digit", minute: "2-digit",
+            })
             : "Календарь собран";
           render();
         })
@@ -622,8 +678,12 @@
     function render() {
       const label = document.getElementById("label");
       label.textContent = MONTHS[cursor.month - 1] + " " + cursor.year;
-      document.getElementById("prev").textContent = monthName(-1);
-      document.getElementById("next").textContent = monthName(1);
+      for (const [id, delta] of [["prev", -1], ["next", 1]]) {
+        const button = document.getElementById(id);
+        const description = (delta < 0 ? "Предыдущий месяц: " : "Следующий месяц: ") + monthName(delta);
+        button.setAttribute("aria-label", description);
+        button.title = description;
+      }
       const grid = document.getElementById("grid");
       grid.replaceChildren();
       for (const name of WEEKDAYS) {
@@ -788,7 +848,9 @@
 
     function sideLine(match) {
       const node = document.createElement("div");
-      const label = match.home_away_label || "";
+      const label = match.home_away === "home"
+        ? "Домашний"
+        : (isMoscowAway(match) ? "Гостевой (Москва)" : "Гостевой");
       const text = document.createElement("span");
       text.className = "side-text";
       const moscow = " (Москва)";
