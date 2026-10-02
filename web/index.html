@@ -4,9 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Календарь ЦСКА</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&family=Lato&family=Montserrat&family=Noto+Sans&family=Nunito&family=Open+Sans&family=Oswald&family=Poppins&family=Raleway&family=Roboto&family=Source+Sans+3&display=swap">
   <script>
+    const SITE_FONTS = {
+      "JetBrainsMono Nerd Font": '"JetBrainsMono Nerd Font", "JetBrainsMono NF", monospace',
+      "Roboto": "Roboto, sans-serif",
+      "Open Sans": '"Open Sans", sans-serif',
+      "Lato": "Lato, sans-serif",
+      "Montserrat": "Montserrat, sans-serif",
+      "Poppins": "Poppins, sans-serif",
+      "Inter": "Inter, sans-serif",
+      "Noto Sans": '"Noto Sans", sans-serif',
+      "Oswald": "Oswald, sans-serif",
+      "Raleway": "Raleway, sans-serif",
+      "Nunito": "Nunito, sans-serif",
+      "Source Sans 3": '"Source Sans 3", sans-serif',
+    };
     try {
       if (localStorage.getItem("cska-theme") === "light") document.documentElement.dataset.theme = "light";
+      const savedFont = localStorage.getItem("cska-font");
+      if (savedFont && SITE_FONTS[savedFont]) document.documentElement.style.setProperty("--site-font", SITE_FONTS[savedFont]);
     } catch (error) {}
   </script>
   <style>
@@ -35,6 +52,7 @@
       --match: #faf7f2;
       --local: #e5f7e8;
       --nav-btn: #e4e4e4;
+      --site-font: "JetBrainsMono Nerd Font", "JetBrainsMono NF", monospace;
     }
     html[data-theme="dark"] {
       color-scheme: dark;
@@ -60,31 +78,46 @@
       margin: 0;
       color: var(--ink);
       background: var(--bg);
-      font: 15px/1.4 "Segoe UI", "Liberation Sans", "Nimbus Sans", sans-serif;
+      font: 15px/1.4 var(--site-font);
     }
     header {
       position: relative;
-      display: grid;
-      grid-template-columns: 1fr auto auto;
+      display: flex;
       align-items: center;
-      gap: 18px 28px;
       overflow: hidden;
       color: #fff;
       min-height: 148px;
-      padding: 16px 28px;
+      padding: 16px 0;
       background:
         linear-gradient(90deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.18) 34%, rgba(5, 12, 24, 0.12) 68%, rgba(5, 12, 24, 0.5) 100%),
         url("banner.jpg") center 42% / cover no-repeat;
     }
     header h1 {
       position: relative;
-      margin: 0 0 12px;
+      margin: 0;
       font-size: 40px;
       font-weight: 800;
       letter-spacing: 0.01em;
       line-height: 1;
     }
-    .banner-main, .crests, header .today { position: relative; z-index: 1; }
+    .banner-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 18px 28px;
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    .banner-sub {
+      margin: 10px 0 0;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .banner-main, .crests { position: relative; z-index: 1; }
     .crests { display: flex; align-items: center; }
     .crests .tile {
       display: flex;
@@ -97,31 +130,33 @@
     .crests .tile:first-child { padding-left: 0; }
     .crests img { height: 68px; width: auto; display: block; }
     .crests a.tile { text-decoration: none; color: inherit; }
-    header .today {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-self: end;
-      align-self: start;
-      margin-top: 4px;
-      text-align: left;
-    }
-    header .today svg { width: 28px; height: 28px; flex: none; }
-    .today-date { font-size: 18px; font-weight: 700; line-height: 1.15; }
-    .today-weekday { font-size: 15px; opacity: 0.9; }
     main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
-    .nav { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+    .nav {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-top: 18px;
+    }
+    .bar #sports { justify-self: start; align-items: center; }
     .theme {
-      position: absolute;
-      right: 12px;
-      bottom: 8px;
+      grid-column: 3;
+      justify-self: end;
       display: inline-flex;
       align-items: center;
+      box-sizing: border-box;
+      height: 36px;
+      min-height: 36px;
       gap: 10px;
-      padding: 6px 14px 6px 8px;
+      padding: 0 14px 0 8px;
       white-space: nowrap;
-      background: #0c1e38;
-      color: #fff;
+      background: var(--outside);
+      color: var(--ink);
       border: 0;
       border-radius: 999px;
       font-weight: 650;
@@ -134,6 +169,10 @@
       background: #8d97a8;
       position: relative;
       flex: none;
+    }
+    html[data-theme="dark"] .theme {
+      background: #0c1e38;
+      color: #fff;
     }
     html[data-theme="dark"] .theme .track { background: #9a3a3a; }
     .theme .knob {
@@ -159,8 +198,9 @@
       cursor: pointer;
     }
     button[aria-pressed="true"]:not(.theme) { color: #fff; border-color: transparent; }
-    header #sports { gap: 12px; }
-    header #sports button {
+    #sports { gap: 12px; }
+    #sports button {
+      position: relative;
       display: block;
       width: auto;
       height: auto;
@@ -172,20 +212,52 @@
       opacity: 0.42;
       filter: grayscale(0.65) brightness(0.82);
     }
-    header #sports button[aria-pressed="true"] {
+    #sports .sport-count {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 2px);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+      pointer-events: none;
+    }
+    #sports button[aria-pressed="true"] {
       opacity: 1;
       filter: none;
       background: transparent;
       border-color: transparent;
     }
-    header #sports button img {
+    #sports button img {
       width: auto;
-      height: 42px;
+      height: 36px;
       display: block;
       border-radius: 0;
       pointer-events: none;
     }
-    #sides { gap: 12px; }
+    #font {
+      grid-column: 2;
+      justify-self: center;
+      height: 36px;
+      max-width: 280px;
+      padding: 0 32px 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: #0c1e38 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") right 12px center no-repeat;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+      appearance: none;
+    }
+    #sides {
+      grid-column: 2;
+      justify-self: center;
+      align-items: center;
+      gap: 12px;
+    }
     #sides button {
       display: block;
       width: auto;
@@ -206,7 +278,7 @@
     }
     #sides button img {
       width: auto;
-      height: 42px;
+      height: 36px;
       display: block;
       border-radius: 0;
       pointer-events: none;
@@ -224,12 +296,11 @@
       gap: 8px;
       margin-bottom: 6px;
     }
-    #sides { grid-column: 2; justify-self: center; }
     #status { grid-column: 1; margin: 0; justify-self: start; }
     #updated { grid-column: 3; margin: 0; color: var(--muted); font-size: 13px; justify-self: end; text-align: right; }
-    .nav h2 { margin: 0; font-size: 22px; text-transform: capitalize; }
+    .nav h2 { margin: 0; font-size: 22px; text-transform: uppercase; }
     .nav button {
-      border-radius: 8px;
+      border-radius: 999px;
       text-transform: capitalize;
       background: var(--nav-btn);
       border-color: var(--nav-btn);
@@ -243,13 +314,17 @@
     }
     .match { overflow-wrap: break-word; }
     @media (max-width: 760px) {
-      header { grid-template-columns: 1fr; padding: 16px 24px 56px; }
+      .banner-inner { padding-bottom: 0; }
       header h1 { font-size: 30px; }
       .crests img { height: 48px; }
-      header .today { justify-self: start; }
+      .nav { justify-content: center; }
+      .bar { grid-template-columns: 1fr; justify-items: start; gap: 8px; }
+      .bar #sports, #sides, .bar .theme { grid-column: 1; }
+      #sides { justify-self: center; }
+      .bar .theme { justify-self: end; }
       .meta { grid-template-columns: 1fr; }
-      #status, #sides, #updated { grid-column: auto; }
-      #sides { justify-self: start; }
+      #font, #status, #updated { grid-column: 1; }
+      #font { justify-self: center; }
       .weekday { display: none; }
       .grid { grid-template-columns: 1fr; }
       .cell { min-height: 0; }
@@ -268,7 +343,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       min-height: 108px;
-      padding: 6px;
+      padding: 0 6px 6px;
     }
     .cell.outside {
       background: var(--outside);
@@ -277,7 +352,15 @@
     .cell.outside .daynum { color: var(--outside-num); font-weight: 600; }
     .cell.outside .match { opacity: 0.55; }
     .cell.today { outline: 2px solid var(--red); }
-    .daynum { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    .daynum {
+      margin: 0 -6px 4px;
+      padding: 4px 8px;
+      background: var(--nav-btn);
+      border-radius: 7px 7px 0 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
     .cell.today .daynum { color: var(--red); }
     .match {
       display: block;
@@ -294,19 +377,21 @@
     .match.hockey { border-left-color: var(--hockey); }
     .match.basketball { border-left-color: var(--basketball); }
     .match .sport {
-      position: absolute;
-      right: 4px;
-      bottom: 3px;
-      font-size: 12px;
+      flex: none;
+      margin-left: auto;
+      font-size: 11px;
       font-weight: 400;
       color: var(--muted);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .match .foot {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 4px 8px;
+      gap: 4px;
+      height: 1.2em;
+      margin-right: -32px;
     }
     .match .icon {
       position: absolute;
@@ -337,7 +422,13 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-right: -30px;
+      margin-right: -32px;
+    }
+    .match .side-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .match .sub, .match .club-place, .match .time { font-size: 12px; color: var(--muted); line-height: 1.2; }
     .match .club-place { height: 14.4px; line-height: 14.4px; }
@@ -348,10 +439,23 @@
       text-overflow: ellipsis;
       margin-right: -30px;
     }
-    .match .foot { height: 1.2em; }
-    .match .time { font-weight: 700; color: var(--ink); }
+    .match .time {
+      display: block;
+      height: 1.2em;
+      font-weight: 700;
+      color: var(--ink);
+    }
     .side-home, .side-moscow { color: var(--side-home); }
     .side-away { color: var(--side-away); }
+    .match .comp {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+    }
     .score-win { color: var(--score-win); }
     .score-loss { color: var(--score-loss); }
     .score-draw { color: var(--score-draw); }
@@ -362,30 +466,17 @@
 </head>
 <body>
   <header>
+    <div class="banner-inner">
     <div class="banner-main">
-      <h1>Мы ЦСКА</h1>
-      <div class="group" id="sports">
-        <button type="button" data-sport="football" aria-pressed="true" aria-label="Футбол"><img src="icons/sport-football.png?v=3" alt=""></button>
-        <button type="button" data-sport="hockey" aria-pressed="true" aria-label="Хоккей"><img src="icons/sport-hockey.png?v=3" alt=""></button>
-        <button type="button" data-sport="basketball" aria-pressed="true" aria-label="Баскетбол"><img src="icons/sport-basketball.png?v=3" alt=""></button>
-      </div>
+      <h1>ЦСКА</h1>
+      <p class="banner-sub">Футбол. Хоккей. Баскетбол.</p>
     </div>
     <div class="crests">
       <a class="tile" href="https://pfc-cska.com/" target="_blank" rel="noreferrer"><img src="icons/football.svg" alt="ПФК ЦСКА"></a>
       <a class="tile" href="https://cska-hockey.ru/" target="_blank" rel="noreferrer"><img src="icons/hockey.svg" alt="ХК ЦСКА"></a>
       <a class="tile" href="https://cskabasket.ru/" target="_blank" rel="noreferrer"><img src="icons/basketball.svg" alt="ПБК ЦСКА"></a>
     </div>
-    <div class="today">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <div>
-        <div class="today-date"></div>
-        <div class="today-weekday"></div>
-      </div>
     </div>
-    <button type="button" id="theme" class="theme" aria-pressed="true">
-      <span class="track" aria-hidden="true"><span class="knob"></span></span>
-      <span class="theme-label">Тёмная</span>
-    </button>
   </header>
   <main>
     <div class="nav">
@@ -395,12 +486,24 @@
         <button type="button" id="next">месяц →</button>
       </div>
     </div>
-    <div class="meta">
-      <p id="status"></p>
+    <div class="bar">
+      <div class="group" id="sports">
+        <button type="button" data-sport="football" aria-pressed="true" aria-label="Футбол"><span class="sport-count" data-count="football">0</span><img src="icons/sport-football.png?v=3" alt=""></button>
+        <button type="button" data-sport="hockey" aria-pressed="true" aria-label="Хоккей"><span class="sport-count" data-count="hockey">0</span><img src="icons/sport-hockey.png?v=3" alt=""></button>
+        <button type="button" data-sport="basketball" aria-pressed="true" aria-label="Баскетбол"><span class="sport-count" data-count="basketball">0</span><img src="icons/sport-basketball.png?v=3" alt=""></button>
+      </div>
       <div class="group" id="sides">
         <button type="button" data-side="home" aria-pressed="true" aria-label="Дома"><img src="icons/side-home.png?v=3" alt=""></button>
         <button type="button" data-side="away" aria-pressed="true" aria-label="Выезд"><img src="icons/side-away.png?v=3" alt=""></button>
       </div>
+      <button type="button" id="theme" class="theme" aria-pressed="true">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span>
+        <span class="theme-label">Тема</span>
+      </button>
+    </div>
+    <div class="meta">
+      <p id="status"></p>
+      <select id="font" aria-label="Шрифт сайта"></select>
       <p id="updated">Загрузка…</p>
     </div>
     <div class="wrap">
@@ -427,14 +530,30 @@
     let matches = [];
     let cursor = todayParts();
 
-    showToday();
-
     const themeButton = document.getElementById("theme");
     applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
     themeButton.addEventListener("click", () => {
       const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       applyTheme(next);
       try { localStorage.setItem("cska-theme", next); } catch (error) {}
+    });
+
+    const fontSelect = document.getElementById("font");
+    for (const name of Object.keys(SITE_FONTS)) {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      option.style.fontFamily = SITE_FONTS[name];
+      fontSelect.append(option);
+    }
+    let savedFont = "JetBrainsMono Nerd Font";
+    try { savedFont = localStorage.getItem("cska-font") || savedFont; } catch (error) {}
+    if (!SITE_FONTS[savedFont]) savedFont = "JetBrainsMono Nerd Font";
+    fontSelect.value = savedFont;
+    applyFont(savedFont);
+    fontSelect.addEventListener("change", () => {
+      applyFont(fontSelect.value);
+      try { localStorage.setItem("cska-font", fontSelect.value); } catch (error) {}
     });
 
     document.getElementById("sports").addEventListener("click", (event) => toggle(event, sports, "sport"));
@@ -459,21 +578,15 @@
         document.getElementById("updated").textContent = "Нет matches.json. Сначала запустите python -m cska";
       });
 
-    function showToday() {
-      const date = new Date();
-      const zone = { timeZone: "Europe/Moscow" };
-      const parts = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric", ...zone }).formatToParts(date);
-      const value = (type) => parts.find((part) => part.type === type).value;
-      document.querySelector(".today-date").textContent = value("day") + " " + value("month") + " " + value("year");
-      const weekday = new Intl.DateTimeFormat("ru-RU", { weekday: "long", ...zone }).format(date);
-      document.querySelector(".today-weekday").textContent = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-    }
-
     function applyTheme(theme) {
       const dark = theme === "dark";
       document.documentElement.dataset.theme = dark ? "dark" : "light";
       themeButton.setAttribute("aria-pressed", dark ? "true" : "false");
-      themeButton.querySelector(".theme-label").textContent = dark ? "Тёмная" : "Светлая";
+      themeButton.querySelector(".theme-label").textContent = "Тема";
+    }
+
+    function applyFont(name) {
+      document.documentElement.style.setProperty("--site-font", SITE_FONTS[name]);
     }
 
     function toggle(event, bag, attr) {
@@ -518,6 +631,9 @@
       const slots = Math.ceil((lead + days) / 7) * 7;
       const gridStart = dateKey(new Date(cursor.year, cursor.month - 1, 1 - lead));
       const gridEnd = dateKey(new Date(cursor.year, cursor.month - 1, slots - lead));
+      const monthStart = dateKey(new Date(cursor.year, cursor.month - 1, 1));
+      const monthEnd = dateKey(new Date(cursor.year, cursor.month - 1, days));
+      updateSportCounts(gridStart, gridEnd, monthStart, monthEnd);
       let shown = 0;
       for (let index = 0; index < slots; index += 1) {
         const date = new Date(cursor.year, cursor.month - 1, 1 - lead + index);
@@ -555,6 +671,7 @@
         scoreLine(match),
         sideLine(match),
         venueLine(match),
+        timeLine(match),
         footLine(match),
       ];
       link.append(...lines.filter(Boolean));
@@ -603,16 +720,27 @@
       return node;
     }
 
+    function timeLine(match) {
+      const node = document.createElement("div");
+      node.className = "time";
+      node.textContent = match.time_label || "не определено";
+      return node;
+    }
+
     function footLine(match) {
       const row = document.createElement("div");
       row.className = "foot";
+      const kind = competitionLabel(match);
+      if (kind) {
+        const mark = document.createElement("span");
+        mark.className = "comp";
+        mark.textContent = kind;
+        row.append(mark);
+      }
       const sport = document.createElement("span");
       sport.className = "sport";
       sport.textContent = match.sport_label;
-      const time = document.createElement("span");
-      time.className = "time";
-      time.textContent = match.time_label || "не определено";
-      row.append(time, sport);
+      row.append(sport);
       return row;
     }
 
@@ -626,21 +754,34 @@
       return "draw";
     }
 
+    function competitionLabel(match) {
+      const name = (match.tournament || "").toLowerCase().replaceAll("ё", "е");
+      if (name.includes("товарищ")) return "Контрольный";
+      if (name.includes("плей-офф") || name.includes("плей офф") || name.includes("play-off") || name.includes("playoff")) return "Плей-офф";
+      if (name.includes("кубок") || name.includes("cup")) return "Кубок";
+      if (name.includes("рпл") || name.includes("кхл") || name.includes("ел втб") || name.includes("чемпионат")) return "Чемпионат";
+      return "";
+    }
+
     function sideLine(match) {
       const node = document.createElement("div");
       const label = match.home_away_label || "";
+      const text = document.createElement("span");
+      text.className = "side-text";
       const moscow = " (Москва)";
       if (label.endsWith(moscow)) {
         node.className = "side side-away";
-        node.append(document.createTextNode(label.slice(0, -moscow.length) + " "));
+        text.append(document.createTextNode(label.slice(0, -moscow.length) + " "));
         const city = document.createElement("span");
         city.className = "side-moscow";
         city.textContent = "(Москва)";
-        node.append(city);
-        return node;
+        text.append(city);
+      } else {
+        node.className = "side " + (match.home_away === "home" ? "side-home" : "side-away");
+        text.textContent = label;
       }
-      node.className = "side " + (match.home_away === "home" ? "side-home" : "side-away");
-      node.textContent = label;
+      text.title = label;
+      node.append(text);
       return node;
     }
 
@@ -655,6 +796,32 @@
       node.className = className;
       node.textContent = value;
       return node;
+    }
+
+    const SPORT_NAMES = { football: "Футбол", hockey: "Хоккей", basketball: "Баскетбол" };
+
+    function playedInMoscow(match) {
+      if (match.home_away === "home") return true;
+      return (match.home_away_label || "").includes("(Москва)");
+    }
+
+    function updateSportCounts(gridStart, gridEnd, monthStart, monthEnd) {
+      const counts = { football: 0, hockey: 0, basketball: 0 };
+      const moscow = { football: 0, hockey: 0, basketball: 0 };
+      for (const match of matches) {
+        if (!sides.has(match.home_away)) continue;
+        const key = placeKey(match, gridStart, gridEnd);
+        if (!key || key < monthStart || key > monthEnd) continue;
+        if (!Object.hasOwn(counts, match.sport)) continue;
+        counts[match.sport] += 1;
+        if (playedInMoscow(match)) moscow[match.sport] += 1;
+      }
+      for (const sport of Object.keys(counts)) {
+        const node = document.querySelector('#sports [data-count="' + sport + '"]');
+        if (node) node.textContent = counts[sport] + " (" + moscow[sport] + ")";
+        const button = document.querySelector('#sports [data-sport="' + sport + '"]');
+        if (button) button.setAttribute("aria-label", SPORT_NAMES[sport] + ", " + counts[sport] + ", в Москве " + moscow[sport]);
+      }
     }
 
     function placeKey(match, gridStart, gridEnd) {
