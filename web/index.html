@@ -4,74 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Календарь ЦСКА</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&family=Lato&family=Montserrat&family=Noto+Sans&family=Nunito&family=Open+Sans&family=Oswald&family=Poppins&family=Raleway&family=Roboto&family=Source+Sans+3&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap">
   <script>
-    const SITE_FONTS = {
-      "JetBrainsMono Nerd Font": '"JetBrainsMono Nerd Font", "JetBrainsMono NF", monospace',
-      "Roboto": "Roboto, sans-serif",
-      "Open Sans": '"Open Sans", sans-serif',
-      "Lato": "Lato, sans-serif",
-      "Montserrat": "Montserrat, sans-serif",
-      "Poppins": "Poppins, sans-serif",
-      "Inter": "Inter, sans-serif",
-      "Noto Sans": '"Noto Sans", sans-serif',
-      "Oswald": "Oswald, sans-serif",
-      "Raleway": "Raleway, sans-serif",
-      "Nunito": "Nunito, sans-serif",
-      "Source Sans 3": '"Source Sans 3", sans-serif',
-    };
     try {
       if (localStorage.getItem("cska-theme") === "light") document.documentElement.dataset.theme = "light";
-      const savedFont = localStorage.getItem("cska-font");
-      if (savedFont && SITE_FONTS[savedFont]) document.documentElement.style.setProperty("--site-font", SITE_FONTS[savedFont]);
     } catch (error) {}
   </script>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f3efe6;
-      --ink: #1c1916;
-      --muted: #6d675f;
-      --line: #e2d9cc;
-      --card: #fffdf9;
-      --red: #b11218;
-      --loss: #b11218;
-      --football: #b11218;
+      --bg: #eef7fe;
+      --ink: #0c1e38;
+      --muted: #5a7a9a;
+      --line: #c5dff6;
+      --card: #f7faff;
+      --red: #c8102e;
+      --loss: #c8102e;
+      --football: #c8102e;
       --hockey: #1d4e89;
       --basketball: #c45c12;
       --home: #1b7d38;
       --away: #8a6230;
       --draw: #1a56c4;
       --score-win: #1b7d38;
-      --score-loss: #b11218;
+      --score-loss: #c8102e;
       --score-draw: #1a56c4;
       --side-home: #1b7d38;
       --side-away: #8a6230;
-      --outside: #ebe6dc;
-      --outside-num: #b7b0a4;
-      --match: #faf7f2;
-      --local: #e5f7e8;
-      --nav-btn: #e4e4e4;
-      --site-font: "JetBrainsMono Nerd Font", "JetBrainsMono NF", monospace;
+      --outside: #e7f3ff;
+      --outside-num: #7a98b8;
+      --match: #ffffff;
+      --local: #e7f3ff;
+      --nav-btn: #d3e9fe;
+      --site-font: Roboto, sans-serif;
     }
     html[data-theme="dark"] {
       color-scheme: dark;
-      --bg: #12110f;
-      --ink: #f3efe6;
-      --muted: #b3aaa0;
-      --line: #3a342c;
-      --card: #1e1b18;
+      --bg: #090e15;
+      --ink: #e7eef8;
+      --muted: #8ea6c2;
+      --line: #243040;
+      --card: #10161e;
+      --red: #e10600;
       --loss: #ff6d6d;
       --score-win: #4dce74;
       --score-loss: #ff6d6d;
       --score-draw: #7eb0ff;
       --side-home: #4dce74;
       --side-away: #e2b07a;
-      --outside: #161412;
-      --outside-num: #6f675e;
-      --match: #2a2622;
-      --local: #1a3326;
-      --nav-btn: #3a342c;
+      --outside: #070b11;
+      --outside-num: #6e88a8;
+      --match: #172331;
+      --local: #172331;
+      --nav-btn: #1c2a3c;
     }
     * { box-sizing: border-box; }
     body {
@@ -132,21 +117,30 @@
     .crests a.tile { text-decoration: none; color: inherit; }
     main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
     .nav {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .bar {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      align-items: center;
+      align-items: start;
       margin-bottom: 10px;
-      padding-top: 18px;
     }
-    .bar #sports { justify-self: start; align-items: center; }
-    .theme {
-      grid-column: 3;
+    .filters {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .month-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-actions {
       justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme {
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
@@ -155,7 +149,7 @@
       gap: 10px;
       padding: 0 14px 0 8px;
       white-space: nowrap;
-      background: var(--outside);
+      background: var(--nav-btn);
       color: var(--ink);
       border: 0;
       border-radius: 999px;
@@ -166,13 +160,9 @@
       width: 42px;
       height: 24px;
       border-radius: 999px;
-      background: #8d97a8;
+      background: #6e8aab;
       position: relative;
       flex: none;
-    }
-    html[data-theme="dark"] .theme {
-      background: #0c1e38;
-      color: #fff;
     }
     html[data-theme="dark"] .theme .track { background: #9a3a3a; }
     .theme .knob {
@@ -198,114 +188,61 @@
       cursor: pointer;
     }
     button[aria-pressed="true"]:not(.theme) { color: #fff; border-color: transparent; }
-    #sports { gap: 12px; }
-    #sports button {
+    #sports, #sides { align-items: center; gap: 8px; }
+    #sports button, #sides button {
       position: relative;
-      display: block;
-      width: auto;
-      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
       padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-      opacity: 0.42;
-      filter: grayscale(0.65) brightness(0.82);
-    }
-    #sports .sport-count {
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 2px);
-      transform: translateX(-50%);
-      white-space: nowrap;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--ink);
-      pointer-events: none;
-    }
-    #sports button[aria-pressed="true"] {
-      opacity: 1;
-      filter: none;
-      background: transparent;
-      border-color: transparent;
-    }
-    #sports button img {
-      width: auto;
-      height: 36px;
-      display: block;
-      border-radius: 0;
-      pointer-events: none;
-    }
-    #font {
-      grid-column: 2;
-      justify-self: center;
-      height: 36px;
-      max-width: 280px;
-      padding: 0 32px 0 14px;
       border: 0;
       border-radius: 999px;
-      background: #0c1e38 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23fff' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") right 12px center no-repeat;
-      color: #fff;
-      font: inherit;
-      cursor: pointer;
-      appearance: none;
-    }
-    #sides {
-      grid-column: 2;
-      justify-self: center;
-      align-items: center;
-      gap: 12px;
-    }
-    #sides button {
-      display: block;
-      width: auto;
-      height: auto;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
+      background: var(--nav-btn);
       box-shadow: none;
-      opacity: 0.42;
-      filter: grayscale(0.65) brightness(0.82);
+      opacity: 1;
+      filter: none;
     }
+    #sports button[aria-pressed="true"],
     #sides button[aria-pressed="true"] {
-      opacity: 1;
-      filter: none;
-      background: transparent;
+      background: var(--nav-btn);
       border-color: transparent;
     }
-    #sides button img {
+    #sports button img, #sides button img {
       width: auto;
-      height: 36px;
+      height: 26px;
       display: block;
       border-radius: 0;
       pointer-events: none;
+      opacity: 0.45;
     }
-    button[data-sport="football"][aria-pressed="true"] { background: var(--football); }
-    button[data-sport="hockey"][aria-pressed="true"] { background: var(--hockey); }
-    button[data-sport="basketball"][aria-pressed="true"] { background: var(--basketball); }
-    button[data-side="home"][aria-pressed="true"] { background: var(--home); }
-    button[data-side="away"][aria-pressed="true"] { background: var(--away); }
+    html:not([data-theme="dark"]) #sports button img,
+    html:not([data-theme="dark"]) #sides button img {
+      filter: brightness(0);
+    }
+    #sports button[aria-pressed="true"] img,
+    #sides button[aria-pressed="true"] img { opacity: 1; }
     .months { display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .meta {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
+    #updated {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.2;
+      text-align: center;
+      white-space: nowrap;
     }
-    #status { grid-column: 1; margin: 0; justify-self: start; }
-    #updated { grid-column: 3; margin: 0; color: var(--muted); font-size: 13px; justify-self: end; text-align: right; }
     .nav h2 { margin: 0; font-size: 22px; text-transform: uppercase; }
-    .nav button {
+    .months button, #refresh {
+      height: 36px;
+      padding: 0 14px;
       border-radius: 999px;
-      text-transform: capitalize;
       background: var(--nav-btn);
       border-color: var(--nav-btn);
       color: var(--ink);
     }
+    .months button { text-transform: capitalize; }
+    #refresh:disabled { opacity: 0.6; cursor: default; }
     .wrap { overflow-x: auto; }
     .grid {
       display: grid;
@@ -317,14 +254,9 @@
       .banner-inner { padding-bottom: 0; }
       header h1 { font-size: 30px; }
       .crests img { height: 48px; }
-      .nav { justify-content: center; }
-      .bar { grid-template-columns: 1fr; justify-items: start; gap: 8px; }
-      .bar #sports, #sides, .bar .theme { grid-column: 1; }
-      #sides { justify-self: center; }
-      .bar .theme { justify-self: end; }
-      .meta { grid-template-columns: 1fr; }
-      #font, #status, #updated { grid-column: 1; }
-      #font { justify-self: center; }
+      .nav { grid-template-columns: 1fr; justify-items: center; gap: 8px; }
+      .filters, .nav-actions { justify-self: center; }
+      #updated { white-space: normal; }
       .weekday { display: none; }
       .grid { grid-template-columns: 1fr; }
       .cell { min-height: 0; }
@@ -459,7 +391,6 @@
     .score-win { color: var(--score-win); }
     .score-loss { color: var(--score-loss); }
     .score-draw { color: var(--score-draw); }
-    #status { color: var(--muted); }
     footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
     footer a { color: var(--hockey); }
   </style>
@@ -480,31 +411,32 @@
   </header>
   <main>
     <div class="nav">
-      <div class="months">
-        <button type="button" id="prev">← месяц</button>
-        <h2 id="label"></h2>
-        <button type="button" id="next">месяц →</button>
+      <div class="filters">
+        <div class="group" id="sides">
+          <button type="button" data-side="home" aria-pressed="true" aria-label="Дома"><img src="icons/side-home.png?v=4" alt=""></button>
+          <button type="button" data-side="away" aria-pressed="true" aria-label="Выезд"><img src="icons/side-away.png?v=4" alt=""></button>
+        </div>
+        <div class="group" id="sports">
+          <button type="button" data-sport="football" aria-pressed="true" aria-label="Футбол"><img src="icons/sport-football.png?v=4" alt=""></button>
+          <button type="button" data-sport="hockey" aria-pressed="true" aria-label="Хоккей"><img src="icons/sport-hockey.png?v=4" alt=""></button>
+          <button type="button" data-sport="basketball" aria-pressed="true" aria-label="Баскетбол"><img src="icons/sport-basketball.png?v=4" alt=""></button>
+        </div>
       </div>
-    </div>
-    <div class="bar">
-      <div class="group" id="sports">
-        <button type="button" data-sport="football" aria-pressed="true" aria-label="Футбол"><span class="sport-count" data-count="football">0</span><img src="icons/sport-football.png?v=3" alt=""></button>
-        <button type="button" data-sport="hockey" aria-pressed="true" aria-label="Хоккей"><span class="sport-count" data-count="hockey">0</span><img src="icons/sport-hockey.png?v=3" alt=""></button>
-        <button type="button" data-sport="basketball" aria-pressed="true" aria-label="Баскетбол"><span class="sport-count" data-count="basketball">0</span><img src="icons/sport-basketball.png?v=3" alt=""></button>
+      <div class="month-block">
+        <div class="months">
+          <button type="button" id="prev">← месяц</button>
+          <h2 id="label"></h2>
+          <button type="button" id="next">месяц →</button>
+        </div>
+        <p id="updated">Загрузка…</p>
       </div>
-      <div class="group" id="sides">
-        <button type="button" data-side="home" aria-pressed="true" aria-label="Дома"><img src="icons/side-home.png?v=3" alt=""></button>
-        <button type="button" data-side="away" aria-pressed="true" aria-label="Выезд"><img src="icons/side-away.png?v=3" alt=""></button>
+      <div class="nav-actions">
+        <button type="button" id="theme" class="theme" aria-pressed="true">
+          <span class="track" aria-hidden="true"><span class="knob"></span></span>
+          <span class="theme-label">Тема</span>
+        </button>
+        <button type="button" id="refresh">Обновить</button>
       </div>
-      <button type="button" id="theme" class="theme" aria-pressed="true">
-        <span class="track" aria-hidden="true"><span class="knob"></span></span>
-        <span class="theme-label">Тема</span>
-      </button>
-    </div>
-    <div class="meta">
-      <p id="status"></p>
-      <select id="font" aria-label="Шрифт сайта"></select>
-      <p id="updated">Загрузка…</p>
     </div>
     <div class="wrap">
       <div class="grid" id="grid"></div>
@@ -538,55 +470,56 @@
       try { localStorage.setItem("cska-theme", next); } catch (error) {}
     });
 
-    const fontSelect = document.getElementById("font");
-    for (const name of Object.keys(SITE_FONTS)) {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      option.style.fontFamily = SITE_FONTS[name];
-      fontSelect.append(option);
-    }
-    let savedFont = "JetBrainsMono Nerd Font";
-    try { savedFont = localStorage.getItem("cska-font") || savedFont; } catch (error) {}
-    if (!SITE_FONTS[savedFont]) savedFont = "JetBrainsMono Nerd Font";
-    fontSelect.value = savedFont;
-    applyFont(savedFont);
-    fontSelect.addEventListener("change", () => {
-      applyFont(fontSelect.value);
-      try { localStorage.setItem("cska-font", fontSelect.value); } catch (error) {}
-    });
-
     document.getElementById("sports").addEventListener("click", (event) => toggle(event, sports, "sport"));
     document.getElementById("sides").addEventListener("click", (event) => toggle(event, sides, "side"));
     document.getElementById("prev").addEventListener("click", () => shift(-1));
     document.getElementById("next").addEventListener("click", () => shift(1));
+    document.getElementById("refresh").addEventListener("click", refreshCalendar);
+    loadMatches();
 
-    fetch("matches.json", { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) throw new Error(String(response.status));
-        return response.json();
-      })
-      .then((payload) => {
-        matches = payload.matches || [];
-        const updated = payload.updated_at ? new Date(payload.updated_at) : null;
-        document.getElementById("updated").textContent = updated
-          ? "Обновлено " + updated.toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })
-          : "Календарь собран";
-        render();
-      })
-      .catch(() => {
-        document.getElementById("updated").textContent = "Нет matches.json. Сначала запустите python -m cska";
-      });
+    function loadMatches() {
+      return fetch("matches.json", { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json();
+        })
+        .then((payload) => {
+          matches = payload.matches || [];
+          const updated = payload.updated_at ? new Date(payload.updated_at) : null;
+          document.getElementById("updated").textContent = updated
+            ? "Обновлено " + updated.toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })
+            : "Календарь собран";
+          render();
+        })
+        .catch(() => {
+          document.getElementById("updated").textContent = "Нет matches.json. Сначала запустите python -m cska";
+        });
+    }
+
+    function refreshCalendar() {
+      const button = document.getElementById("refresh");
+      if (button.disabled) return;
+      button.disabled = true;
+      button.textContent = "Обновление…";
+      fetch("/refresh", { method: "POST" })
+        .then((response) => {
+          if (!response.ok && response.status !== 502) throw new Error(String(response.status));
+          return loadMatches();
+        })
+        .catch(() => {
+          document.getElementById("updated").textContent = "Не удалось обновить";
+        })
+        .finally(() => {
+          button.disabled = false;
+          button.textContent = "Обновить";
+        });
+    }
 
     function applyTheme(theme) {
       const dark = theme === "dark";
       document.documentElement.dataset.theme = dark ? "dark" : "light";
       themeButton.setAttribute("aria-pressed", dark ? "true" : "false");
       themeButton.querySelector(".theme-label").textContent = "Тема";
-    }
-
-    function applyFont(name) {
-      document.documentElement.style.setProperty("--site-font", SITE_FONTS[name]);
     }
 
     function toggle(event, bag, attr) {
@@ -631,10 +564,6 @@
       const slots = Math.ceil((lead + days) / 7) * 7;
       const gridStart = dateKey(new Date(cursor.year, cursor.month - 1, 1 - lead));
       const gridEnd = dateKey(new Date(cursor.year, cursor.month - 1, slots - lead));
-      const monthStart = dateKey(new Date(cursor.year, cursor.month - 1, 1));
-      const monthEnd = dateKey(new Date(cursor.year, cursor.month - 1, days));
-      updateSportCounts(gridStart, gridEnd, monthStart, monthEnd);
-      let shown = 0;
       for (let index = 0; index < slots; index += 1) {
         const date = new Date(cursor.year, cursor.month - 1, 1 - lead + index);
         const key = dateKey(date);
@@ -648,14 +577,10 @@
         cell.append(num);
         for (const match of visible) {
           if (placeKey(match, gridStart, gridEnd) !== key) continue;
-          if (!outside) shown += 1;
           cell.append(card(match));
         }
         grid.append(cell);
       }
-      document.getElementById("status").textContent = shown
-        ? "Матчей в этом месяце: " + shown
-        : "В этом месяце по выбранным фильтрам матчей нет";
     }
 
     function card(match) {
@@ -796,32 +721,6 @@
       node.className = className;
       node.textContent = value;
       return node;
-    }
-
-    const SPORT_NAMES = { football: "Футбол", hockey: "Хоккей", basketball: "Баскетбол" };
-
-    function playedInMoscow(match) {
-      if (match.home_away === "home") return true;
-      return (match.home_away_label || "").includes("(Москва)");
-    }
-
-    function updateSportCounts(gridStart, gridEnd, monthStart, monthEnd) {
-      const counts = { football: 0, hockey: 0, basketball: 0 };
-      const moscow = { football: 0, hockey: 0, basketball: 0 };
-      for (const match of matches) {
-        if (!sides.has(match.home_away)) continue;
-        const key = placeKey(match, gridStart, gridEnd);
-        if (!key || key < monthStart || key > monthEnd) continue;
-        if (!Object.hasOwn(counts, match.sport)) continue;
-        counts[match.sport] += 1;
-        if (playedInMoscow(match)) moscow[match.sport] += 1;
-      }
-      for (const sport of Object.keys(counts)) {
-        const node = document.querySelector('#sports [data-count="' + sport + '"]');
-        if (node) node.textContent = counts[sport] + " (" + moscow[sport] + ")";
-        const button = document.querySelector('#sports [data-sport="' + sport + '"]');
-        if (button) button.setAttribute("aria-label", SPORT_NAMES[sport] + ", " + counts[sport] + ", в Москве " + moscow[sport]);
-      }
     }
 
     function placeKey(match, gridStart, gridEnd) {

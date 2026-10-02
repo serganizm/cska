@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import functools
 import http.server
+import json
+import threading
 import traceback
 
 from cska.export_ics import write_ics
@@ -66,10 +67,42 @@ def update() -> int:
     return 0
 
 
+_refresh_lock = threading.Lock()
+
+
 def serve(port: int) -> int:
     web = ROOT / "web"
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(web))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(web), **kwargs)
+
+        def do_POST(self):
+            if self.path.split("?", 1)[0].rstrip("/") != "/refresh":
+                self.send_error(404)
+                return
+            if not _refresh_lock.acquire(blocking=False):
+                self._send_json(409, {"ok": False, "error": "refresh already running"})
+                return
+            try:
+                code = update()
+            except Exception as error:
+                self._send_json(500, {"ok": False, "error": str(error)})
+                return
+            finally:
+                _refresh_lock.release()
+            self._send_json(200 if code == 0 else 502, {"ok": code == 0})
+
+        def _send_json(self, status: int, payload: dict) -> None:
+            body = json.dumps(payload, ensure_ascii=False).encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"Календарь: http://127.0.0.1:{port}/")
     try:
         server.serve_forever()
