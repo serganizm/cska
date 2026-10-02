@@ -42,7 +42,11 @@ def write_ics(matches: list[Match], now: datetime | None = None) -> Path:
         description = "\n".join(
             [
                 match.sport_label(),
-                match.opponent,
+                (
+                    f"{match.club_name()} ({match.club_place()})"
+                    if match.club_place()
+                    else match.club_name()
+                ),
                 match.side_text(),
                 match.venue or "арена не указана",
                 match.time_text(),

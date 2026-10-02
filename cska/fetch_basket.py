@@ -6,7 +6,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 from cska.http_client import fetch_text
-from cska.model import MSK, Match
+from cska.model import MSK, KNOWN_CITIES, Match, _fold
 
 CALENDAR_URL = "https://cskabasket.ru/schedule/?all=Y"
 SITE = "https://cskabasket.ru"
@@ -87,7 +87,7 @@ def _parse_row(row, years: dict[int, int]) -> Match | None:
     stadium_nodes = [node for node in row.select(".match-stadium") if node.get_text(" ", strip=True)]
     tournament = " ".join(stadium_nodes[0].get_text(" ", strip=True).split()) if stadium_nodes else ""
     venue = " ".join(stadium_nodes[1].get_text(" ", strip=True).split()) if len(stadium_nodes) > 1 else ""
-    city = "Москва" if _is_moscow_club(opponent) else ""
+    city = KNOWN_CITIES.get(_fold(opponent), "")
     icon = row.select_one(".stadium-info")
     classes = icon.get("class") if icon else []
     if "icon-home" in classes:
@@ -114,11 +114,6 @@ def _parse_row(row, years: dict[int, int]) -> Match | None:
         source_url=source_url,
         opponent_city=city,
     )
-
-
-def _is_moscow_club(name: str) -> bool:
-    key = name.casefold().replace("ё", "е").strip()
-    return key == "мба" or key.startswith("мба ") or key.startswith("мба-")
 
 
 def _score(row) -> str | None:

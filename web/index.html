@@ -53,9 +53,14 @@
     button[data-sport="basketball"][aria-pressed="true"] { background: var(--basketball); }
     button[data-side="home"][aria-pressed="true"] { background: var(--home); }
     button[data-side="away"][aria-pressed="true"] { background: var(--away); }
-    .nav { justify-content: space-between; margin-bottom: 10px; }
+    .nav { justify-content: center; margin-bottom: 10px; gap: 10px; }
     .nav h2 { margin: 0; font-size: 22px; text-transform: capitalize; }
-    .nav button { border-radius: 8px; }
+    .nav button {
+      border-radius: 8px;
+      text-transform: capitalize;
+      background: #e4e4e4;
+      border-color: #e4e4e4;
+    }
     .wrap { overflow-x: auto; }
     .grid {
       display: grid;
@@ -137,7 +142,7 @@
     .match .score { font-size: 13px; font-weight: 700; }
     .match .score-pending { color: var(--muted); font-weight: 650; }
     .match .side { font-size: 12px; font-weight: 700; }
-    .match .sub, .match .time { font-size: 12px; color: var(--muted); }
+    .match .sub, .match .club-place, .match .time { font-size: 12px; color: var(--muted); }
     .match .time { font-weight: 700; color: var(--ink); }
     .side-home, .side-moscow { color: var(--home); }
     .side-away { color: var(--away); }
@@ -234,9 +239,16 @@
       render();
     }
 
+    function monthName(delta) {
+      const date = new Date(Date.UTC(cursor.year, cursor.month - 1 + delta, 1));
+      return MONTHS[date.getUTCMonth()];
+    }
+
     function render() {
       const label = document.getElementById("label");
       label.textContent = MONTHS[cursor.month - 1] + " " + cursor.year;
+      document.getElementById("prev").textContent = monthName(-1);
+      document.getElementById("next").textContent = monthName(1);
       const grid = document.getElementById("grid");
       grid.replaceChildren();
       for (const name of WEEKDAYS) {
@@ -284,14 +296,16 @@
       link.href = match.source_url;
       link.target = "_blank";
       link.rel = "noreferrer";
-      link.append(
+      const lines = [
         emblem(match),
         opponentLine(match),
+        clubPlace(match),
         scoreLine(match),
         sideLine(match),
         textLine("sub", match.venue || "арена не указана"),
         footLine(match),
-      );
+      ];
+      link.append(...lines.filter(Boolean));
       return link;
     }
 
@@ -305,7 +319,15 @@
     function opponentLine(match) {
       const node = document.createElement("div");
       node.className = "opp";
-      node.textContent = match.opponent;
+      node.textContent = match.club_name || match.opponent;
+      return node;
+    }
+
+    function clubPlace(match) {
+      if (!match.club_place) return null;
+      const node = document.createElement("div");
+      node.className = "club-place";
+      node.textContent = "(" + match.club_place + ")";
       return node;
     }
 

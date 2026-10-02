@@ -68,7 +68,10 @@ def _digest_day(match: Match, start, end):
 
 
 def _match_line(match: Match) -> str:
-    opponent = _html(match.opponent if not match.score else f"{match.opponent} {match.score}")
+    title = match.club_name()
+    if match.club_place():
+        title = f"{title} ({match.club_place()})"
+    opponent = _html(title if not match.score else f"{title} {match.score}")
     linked = f'<a href="{_html(match.source_url)}">{opponent}</a>'
     venue = _html(match.venue or "арена не указана")
     return "\n".join(

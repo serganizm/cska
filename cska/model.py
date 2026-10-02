@@ -73,7 +73,25 @@ class Match:
         return "Выезд"
 
     def in_moscow(self) -> bool:
-        return _mentions_moscow(self.opponent_city)
+        return _mentions_moscow(self.opponent_city) or _mentions_moscow(self.club_place())
+
+    def club_place(self) -> str:
+        stored = (self.opponent_city or "").strip()
+        raw = stored or KNOWN_CITIES.get(_fold(self.opponent), "")
+        return PLACE_ALIASES.get(_fold(raw), raw)
+
+    def club_name(self) -> str:
+        name = self.opponent.strip()
+        place = _fold(self.club_place())
+        parts = name.split()
+        if len(parts) >= 2 and place:
+            last = _fold(parts[-1])
+            mapped = SUFFIX_CITIES.get(last)
+            if (mapped and _fold(mapped) == place) or last == place:
+                name = " ".join(parts[:-1]).strip()
+        if _fold(name) in {"хк", "пфк", "пбк"}:
+            name = self.opponent.strip()
+        return name or self.opponent.strip()
 
     def result(self) -> str | None:
         if not self.score or ":" not in self.score:
@@ -108,7 +126,10 @@ class Match:
         return f"{window}, время не назначено"
 
     def summary(self) -> str:
-        opponent = self.opponent if not self.score else f"{self.opponent} {self.score}"
+        title = self.club_name()
+        if self.club_place():
+            title = f"{title} ({self.club_place()})"
+        opponent = title if not self.score else f"{title} {self.score}"
         venue = self.venue or "арена не указана"
         return f"{self.sport_label()}, {opponent}, {self.side_text()}, {venue}, {self.time_text()}"
 
@@ -131,6 +152,9 @@ class Match:
             "sport_label": self.sport_label(),
             "source_id": self.source_id,
             "opponent": self.opponent,
+            "club_name": self.club_name(),
+            "club_place": self.club_place(),
+            "opponent_city": self.opponent_city,
             "tournament": self.tournament,
             "venue": self.venue,
             "home_away": self.home_away,
@@ -144,6 +168,42 @@ class Match:
             "source_url": self.source_url,
             "when_text": self.when_text(),
         }
+
+
+def _fold(value: str) -> str:
+    return (value or "").casefold().replace("ё", "е").strip()
+
+
+SUFFIX_CITIES = {
+    "м": "Москва",
+    "мск": "Москва",
+    "мн": "Минск",
+    "мх": "Махачкала",
+    "мг": "Магнитогорск",
+    "т": "Тула",
+}
+
+PLACE_ALIASES = {
+    "новосибирская область": "Новосибирск",
+}
+
+KNOWN_CITIES = {
+    "автодор": "Саратов",
+    "бетсити парма": "Пермь",
+    "парма": "Пермь",
+    "бешикташ": "Стамбул",
+    "галатасарай": "Стамбул",
+    "динамо владивосток": "Владивосток",
+    "енисей": "Красноярск",
+    "зенит": "Санкт-Петербург",
+    "игокеа": "Александровац",
+    "локомотив-кубань": "Краснодар",
+    "мба": "Москва",
+    "самара": "Самара",
+    "тофаш": "Бурса",
+    "уникс": "Казань",
+    "уралмаш": "Екатеринбург",
+}
 
 
 def _mentions_moscow(value: str) -> bool:
