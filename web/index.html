@@ -320,11 +320,17 @@
     .cell.today .daynum-n { color: var(--red); }
     @media (max-width: 760px) {
       .daynum-wd { display: block; }
-      /* На мобильном экране название месяца разделяет дни над плашкой первого числа. */
+      /* Название месяца — отдельная плашка по центру в стиле кнопки «Обновить». */
       .month-divider {
-        display: block;
-        margin: 12px 0 0;
-        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        justify-self: center;
+        min-height: 36px;
+        margin: 12px 0 8px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: var(--nav-btn);
+        color: var(--ink);
         font-size: 18px;
         text-align: center;
       }
@@ -381,6 +387,10 @@
     }
     .match .score { font-size: 13px; font-weight: 700; line-height: 1.2; height: 1.2em; }
     .match .score-pending { color: var(--muted); font-weight: 650; }
+    /* Отступы между строками после счёта улучшают читаемость на всех экранах. */
+    .match > .side, .match > .sub, .match > .time, .match > .foot {
+      margin-top: 3px;
+    }
     .match .side {
       font-size: 12px;
       font-weight: 700;
