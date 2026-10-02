@@ -1,6 +1,6 @@
 # Календарь матчей ЦСКА
 
-Раз в день собирает матчи ПФК ЦСКА, ХК ЦСКА и ПБК ЦСКА: страница-календарь, сводка в Telegram и файл `web/calendar.ics`.
+Три раза в сутки собирает матчи ПФК ЦСКА, ХК ЦСКА и ПБК ЦСКА: страница-календарь, сводка в Telegram и файл `web/calendar.ics`.
 
 ## Запуск
 
@@ -12,7 +12,7 @@ cp .env.example .env
 .venv/bin/python -m cska serve
 ```
 
-Календарь открывается на [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Публичная копия: [serganizm.github.io/cska](https://serganizm.github.io/cska/). Её обновляет GitHub Actions каждый день в 09:00 по Москве и при каждом пуше в `main`.
+Календарь открывается на [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Публичная копия: [serganizm.github.io/cska](https://serganizm.github.io/cska/). Её обновляет GitHub Actions ежедневно в 12:00, 18:00 и 00:00 по Москве и при каждом пуше в `main`. Запуски по расписанию могут задерживаться на стороне GitHub Actions.
 
 В `.env` нужны `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`. Без них сбор всё равно обновляет страницу и `.ics`, а сообщения не отправляет. Chat id можно взять у [@userinfobot](https://t.me/userinfobot) или из `getUpdates` после сообщения своему боту.
 
