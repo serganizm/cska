@@ -314,12 +314,19 @@
       color: var(--muted);
     }
     .daynum-main { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
-    .daynum-month, .daynum-wd { display: none; letter-spacing: 0.04em; }
-    .daynum-month { font-weight: 650; text-transform: capitalize; }
+    .month-divider, .daynum-wd { display: none; letter-spacing: 0.04em; }
+    .month-divider { font-weight: 650; text-transform: capitalize; }
     .daynum-wd { margin-left: auto; text-transform: uppercase; }
     .cell.today .daynum-n { color: var(--red); }
     @media (max-width: 760px) {
-      .daynum-wd, .daynum-month { display: block; }
+      .daynum-wd { display: block; }
+      /* На мобильном экране название месяца разделяет дни над плашкой первого числа. */
+      .month-divider {
+        display: block;
+        margin: 12px 0 0;
+        padding: 0 8px;
+        font-size: 18px;
+      }
     }
     .match {
       display: block;
@@ -607,10 +614,10 @@
         n.textContent = String(date.getDate());
         main.append(n);
         if (date.getDate() === 1) {
-          const month = document.createElement("span");
-          month.className = "daynum-month";
+          const month = document.createElement("div");
+          month.className = "month-divider";
           month.textContent = MONTHS[date.getMonth()];
-          main.append(month);
+          grid.append(month);
         }
         const wd = document.createElement("span");
         wd.className = "daynum-wd";
