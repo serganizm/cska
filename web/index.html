@@ -108,9 +108,19 @@
     .match.hockey { border-left-color: var(--hockey); }
     .match.basketball { border-left-color: var(--basketball); }
     .match .sport {
-      font-size: 13px;
-      font-weight: 700;
-      text-align: left;
+      position: absolute;
+      right: 4px;
+      bottom: 3px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+    .match .foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px 8px;
     }
     .match .icon {
       position: absolute;
@@ -124,6 +134,8 @@
     }
     .match .icon img { height: 28px; width: auto; display: block; }
     .match .opp { font-size: 13px; font-weight: 650; }
+    .match .score { font-size: 13px; font-weight: 700; }
+    .match .score-pending { color: var(--muted); font-weight: 650; }
     .match .side { font-size: 12px; font-weight: 700; }
     .match .sub, .match .time { font-size: 12px; color: var(--muted); }
     .match .time { font-weight: 700; color: var(--ink); }
@@ -274,11 +286,11 @@
       link.rel = "noreferrer";
       link.append(
         emblem(match),
-        sportLine(match),
         opponentLine(match),
+        scoreLine(match),
         sideLine(match),
         textLine("sub", match.venue || "арена не указана"),
-        textLine("time", match.time_label || "не определено"),
+        footLine(match),
       );
       return link;
     }
@@ -290,24 +302,38 @@
       return icon;
     }
 
-    function sportLine(match) {
-      const row = document.createElement("div");
-      row.className = "sport";
-      row.textContent = match.sport_label;
-      return row;
-    }
-
     function opponentLine(match) {
       const node = document.createElement("div");
       node.className = "opp";
-      node.append(document.createTextNode(match.opponent));
-      if (!match.score) return node;
-      const score = document.createElement("span");
-      const kind = match.result || scoreKind(match.score);
-      if (kind) score.className = "score-" + kind;
-      score.textContent = " " + match.score;
-      node.append(score);
+      node.textContent = match.opponent;
       return node;
+    }
+
+    function scoreLine(match) {
+      const node = document.createElement("div");
+      node.className = "score";
+      if (!match.score) {
+        node.classList.add("score-pending");
+        node.textContent = "- : -";
+        return node;
+      }
+      const kind = match.result || scoreKind(match.score);
+      if (kind) node.classList.add("score-" + kind);
+      node.textContent = match.score;
+      return node;
+    }
+
+    function footLine(match) {
+      const row = document.createElement("div");
+      row.className = "foot";
+      const sport = document.createElement("span");
+      sport.className = "sport";
+      sport.textContent = match.sport_label;
+      const time = document.createElement("span");
+      time.className = "time";
+      time.textContent = match.time_label || "не определено";
+      row.append(time, sport);
+      return row;
     }
 
     function scoreKind(score) {
