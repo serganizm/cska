@@ -120,7 +120,12 @@
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: start;
-      margin-bottom: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      margin: 0 -16px 10px;
+      padding: 8px 16px 10px;
+      background: var(--bg);
     }
     .filters {
       justify-self: start;
@@ -251,10 +256,21 @@
     }
     .match { overflow-wrap: break-word; }
     @media (max-width: 760px) {
-      .banner-inner { padding-bottom: 0; }
+      .banner-inner { padding: 0 20px; }
+      main { padding-left: 20px; padding-right: 20px; }
       header h1 { font-size: 30px; }
       .crests img { height: 48px; }
-      .nav { grid-template-columns: 1fr; justify-items: center; gap: 8px; }
+      .nav {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 8px;
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      .months { gap: 8px; }
+      .nav h2 { white-space: nowrap; }
       .filters, .nav-actions { justify-self: center; }
       #updated { white-space: normal; }
       .weekday { display: none; }
@@ -283,8 +299,12 @@
     }
     .cell.outside .daynum { color: var(--outside-num); font-weight: 600; }
     .cell.outside .match { opacity: 0.55; }
-    .cell.today { outline: 2px solid var(--red); }
+    .cell.today .daynum { outline: 2px solid var(--red); }
     .daynum {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
       margin: 0 -6px 4px;
       padding: 4px 8px;
       background: var(--nav-btn);
@@ -293,7 +313,14 @@
       font-weight: 700;
       color: var(--muted);
     }
-    .cell.today .daynum { color: var(--red); }
+    .daynum-main { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    .daynum-month, .daynum-wd { display: none; letter-spacing: 0.04em; }
+    .daynum-month { font-weight: 650; text-transform: capitalize; }
+    .daynum-wd { margin-left: auto; text-transform: uppercase; }
+    .cell.today .daynum-n { color: var(--red); }
+    @media (max-width: 760px) {
+      .daynum-wd, .daynum-month { display: block; }
+    }
     .match {
       display: block;
       position: relative;
@@ -573,7 +600,22 @@
         if (key === today) cell.classList.add("today");
         const num = document.createElement("div");
         num.className = "daynum";
-        num.textContent = String(date.getDate());
+        const main = document.createElement("span");
+        main.className = "daynum-main";
+        const n = document.createElement("span");
+        n.className = "daynum-n";
+        n.textContent = String(date.getDate());
+        main.append(n);
+        if (date.getDate() === 1) {
+          const month = document.createElement("span");
+          month.className = "daynum-month";
+          month.textContent = MONTHS[date.getMonth()];
+          main.append(month);
+        }
+        const wd = document.createElement("span");
+        wd.className = "daynum-wd";
+        wd.textContent = WEEKDAYS[(date.getDay() + 6) % 7];
+        num.append(main, wd);
         cell.append(num);
         for (const match of visible) {
           if (placeKey(match, gridStart, gridEnd) !== key) continue;
