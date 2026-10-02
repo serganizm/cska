@@ -1,23 +1,59 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Календарь ЦСКА</title>
+  <script>
+    try {
+      if (localStorage.getItem("cska-theme") === "light") document.documentElement.dataset.theme = "light";
+    } catch (error) {}
+  </script>
   <style>
     :root {
+      color-scheme: light;
       --bg: #f3efe6;
       --ink: #1c1916;
       --muted: #6d675f;
       --line: #e2d9cc;
       --card: #fffdf9;
       --red: #b11218;
+      --loss: #b11218;
       --football: #b11218;
       --hockey: #1d4e89;
       --basketball: #c45c12;
       --home: #1b7d38;
       --away: #8a6230;
       --draw: #1a56c4;
+      --score-win: #1b7d38;
+      --score-loss: #b11218;
+      --score-draw: #1a56c4;
+      --side-home: #1b7d38;
+      --side-away: #8a6230;
+      --outside: #ebe6dc;
+      --outside-num: #b7b0a4;
+      --match: #faf7f2;
+      --local: #e5f7e8;
+      --nav-btn: #e4e4e4;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #12110f;
+      --ink: #f3efe6;
+      --muted: #b3aaa0;
+      --line: #3a342c;
+      --card: #1e1b18;
+      --loss: #ff6d6d;
+      --score-win: #4dce74;
+      --score-loss: #ff6d6d;
+      --score-draw: #7eb0ff;
+      --side-home: #4dce74;
+      --side-away: #e2b07a;
+      --outside: #161412;
+      --outside-num: #6f675e;
+      --match: #2a2622;
+      --local: #1a3326;
+      --nav-btn: #3a342c;
     }
     * { box-sizing: border-box; }
     body {
@@ -27,17 +63,92 @@
       font: 15px/1.4 "Segoe UI", "Liberation Sans", "Nimbus Sans", sans-serif;
     }
     header {
-      background: var(--red);
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 18px 28px;
+      overflow: hidden;
       color: #fff;
-      padding: 22px 24px 18px;
+      min-height: 148px;
+      padding: 16px 28px;
+      background:
+        linear-gradient(90deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.18) 34%, rgba(5, 12, 24, 0.12) 68%, rgba(5, 12, 24, 0.5) 100%),
+        url("banner.jpg") center 42% / cover no-repeat;
     }
-    header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.01em; }
-    header p { margin: 6px 0 0; opacity: 0.9; }
+    header h1 {
+      position: relative;
+      margin: 0 0 12px;
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+    .banner-main, .crests, header .today { position: relative; z-index: 1; }
+    .crests { display: flex; align-items: center; }
+    .crests .tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-right: 1px solid rgba(255, 255, 255, 0.45);
+    }
+    .crests .tile:last-child { border-right: 0; padding-right: 0; }
+    .crests .tile:first-child { padding-left: 0; }
+    .crests img { height: 68px; width: auto; display: block; }
+    .crests a.tile { text-decoration: none; color: inherit; }
+    header .today {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-self: end;
+      align-self: start;
+      margin-top: 4px;
+      text-align: left;
+    }
+    header .today svg { width: 28px; height: 28px; flex: none; }
+    .today-date { font-size: 18px; font-weight: 700; line-height: 1.15; }
+    .today-weekday { font-size: 15px; opacity: 0.9; }
     main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
-    .toolbar, .nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .toolbar { margin-bottom: 14px; }
+    .nav { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+    .theme {
+      position: absolute;
+      right: 12px;
+      bottom: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px 6px 8px;
+      white-space: nowrap;
+      background: #0c1e38;
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      font-weight: 650;
+    }
+    .theme .track {
+      display: block;
+      width: 42px;
+      height: 24px;
+      border-radius: 999px;
+      background: #8d97a8;
+      position: relative;
+      flex: none;
+    }
+    html[data-theme="dark"] .theme .track { background: #9a3a3a; }
+    .theme .knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+      transition: transform 0.15s ease;
+    }
+    html[data-theme="dark"] .theme .knob { transform: translateX(18px); }
     .group { display: flex; flex-wrap: wrap; gap: 6px; }
-    .group + .group { margin-left: 8px; }
     button {
       border: 1px solid var(--line);
       background: var(--card);
@@ -47,19 +158,82 @@
       font: inherit;
       cursor: pointer;
     }
-    button[aria-pressed="true"] { color: #fff; border-color: transparent; }
+    button[aria-pressed="true"]:not(.theme) { color: #fff; border-color: transparent; }
+    header #sports { gap: 12px; }
+    header #sports button {
+      display: block;
+      width: auto;
+      height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0.42;
+      filter: grayscale(0.65) brightness(0.82);
+    }
+    header #sports button[aria-pressed="true"] {
+      opacity: 1;
+      filter: none;
+      background: transparent;
+      border-color: transparent;
+    }
+    header #sports button img {
+      width: auto;
+      height: 42px;
+      display: block;
+      border-radius: 0;
+      pointer-events: none;
+    }
+    #sides { gap: 12px; }
+    #sides button {
+      display: block;
+      width: auto;
+      height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0.42;
+      filter: grayscale(0.65) brightness(0.82);
+    }
+    #sides button[aria-pressed="true"] {
+      opacity: 1;
+      filter: none;
+      background: transparent;
+      border-color: transparent;
+    }
+    #sides button img {
+      width: auto;
+      height: 42px;
+      display: block;
+      border-radius: 0;
+      pointer-events: none;
+    }
     button[data-sport="football"][aria-pressed="true"] { background: var(--football); }
     button[data-sport="hockey"][aria-pressed="true"] { background: var(--hockey); }
     button[data-sport="basketball"][aria-pressed="true"] { background: var(--basketball); }
     button[data-side="home"][aria-pressed="true"] { background: var(--home); }
     button[data-side="away"][aria-pressed="true"] { background: var(--away); }
-    .nav { justify-content: center; margin-bottom: 10px; gap: 10px; }
+    .months { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    #sides { grid-column: 2; justify-self: center; }
+    #status { grid-column: 1; margin: 0; justify-self: start; }
+    #updated { grid-column: 3; margin: 0; color: var(--muted); font-size: 13px; justify-self: end; text-align: right; }
     .nav h2 { margin: 0; font-size: 22px; text-transform: capitalize; }
     .nav button {
       border-radius: 8px;
       text-transform: capitalize;
-      background: #e4e4e4;
-      border-color: #e4e4e4;
+      background: var(--nav-btn);
+      border-color: var(--nav-btn);
+      color: var(--ink);
     }
     .wrap { overflow-x: auto; }
     .grid {
@@ -69,6 +243,13 @@
     }
     .match { overflow-wrap: break-word; }
     @media (max-width: 760px) {
+      header { grid-template-columns: 1fr; padding: 16px 24px 56px; }
+      header h1 { font-size: 30px; }
+      .crests img { height: 48px; }
+      header .today { justify-self: start; }
+      .meta { grid-template-columns: 1fr; }
+      #status, #sides, #updated { grid-column: auto; }
+      #sides { justify-self: start; }
       .weekday { display: none; }
       .grid { grid-template-columns: 1fr; }
       .cell { min-height: 0; }
@@ -90,10 +271,10 @@
       padding: 6px;
     }
     .cell.outside {
-      background: #ebe6dc;
+      background: var(--outside);
       border-color: transparent;
     }
-    .cell.outside .daynum { color: #b7b0a4; font-weight: 600; }
+    .cell.outside .daynum { color: var(--outside-num); font-weight: 600; }
     .cell.outside .match { opacity: 0.55; }
     .cell.today { outline: 2px solid var(--red); }
     .daynum { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
@@ -104,12 +285,12 @@
       text-decoration: none;
       color: inherit;
       border-left: 3px solid var(--football);
-      background: #faf7f2;
+      background: var(--match);
       border-radius: 4px;
       padding: 4px 36px 5px 6px;
       margin-top: 4px;
     }
-    .match.local { background: #e5f7e8; }
+    .match.local { background: var(--local); }
     .match.hockey { border-left-color: var(--hockey); }
     .match.basketball { border-left-color: var(--basketball); }
     .match .sport {
@@ -137,18 +318,43 @@
       align-items: center;
       justify-content: flex-end;
     }
-    .match .icon img { height: 28px; width: auto; display: block; }
-    .match .opp { font-size: 13px; font-weight: 650; }
-    .match .score { font-size: 13px; font-weight: 700; }
+    .match .icon img { height: 28px; width: auto; display: block; background: transparent; }
+    .match .title { height: 45.6px; overflow: hidden; }
+    .match .opp {
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 15.6px;
+      max-height: 31.2px;
+      overflow: hidden;
+    }
+    .match .score { font-size: 13px; font-weight: 700; line-height: 1.2; height: 1.2em; }
     .match .score-pending { color: var(--muted); font-weight: 650; }
-    .match .side { font-size: 12px; font-weight: 700; }
-    .match .sub, .match .club-place, .match .time { font-size: 12px; color: var(--muted); }
+    .match .side {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+      height: 1.2em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: -30px;
+    }
+    .match .sub, .match .club-place, .match .time { font-size: 12px; color: var(--muted); line-height: 1.2; }
+    .match .club-place { height: 14.4px; line-height: 14.4px; }
+    .match .sub {
+      height: 1.2em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: -30px;
+    }
+    .match .foot { height: 1.2em; }
     .match .time { font-weight: 700; color: var(--ink); }
-    .side-home, .side-moscow { color: var(--home); }
-    .side-away { color: var(--away); }
-    .score-win { color: var(--home); }
-    .score-loss { color: var(--red); }
-    .score-draw { color: var(--draw); }
+    .side-home, .side-moscow { color: var(--side-home); }
+    .side-away { color: var(--side-away); }
+    .score-win { color: var(--score-win); }
+    .score-loss { color: var(--score-loss); }
+    .score-draw { color: var(--score-draw); }
     #status { color: var(--muted); }
     footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
     footer a { color: var(--hockey); }
@@ -156,27 +362,47 @@
 </head>
 <body>
   <header>
-    <h1>Календарь ЦСКА</h1>
-    <p id="updated">Загрузка…</p>
+    <div class="banner-main">
+      <h1>Мы ЦСКА</h1>
+      <div class="group" id="sports">
+        <button type="button" data-sport="football" aria-pressed="true" aria-label="Футбол"><img src="icons/sport-football.png?v=3" alt=""></button>
+        <button type="button" data-sport="hockey" aria-pressed="true" aria-label="Хоккей"><img src="icons/sport-hockey.png?v=3" alt=""></button>
+        <button type="button" data-sport="basketball" aria-pressed="true" aria-label="Баскетбол"><img src="icons/sport-basketball.png?v=3" alt=""></button>
+      </div>
+    </div>
+    <div class="crests">
+      <a class="tile" href="https://pfc-cska.com/" target="_blank" rel="noreferrer"><img src="icons/football.svg" alt="ПФК ЦСКА"></a>
+      <a class="tile" href="https://cska-hockey.ru/" target="_blank" rel="noreferrer"><img src="icons/hockey.svg" alt="ХК ЦСКА"></a>
+      <a class="tile" href="https://cskabasket.ru/" target="_blank" rel="noreferrer"><img src="icons/basketball.svg" alt="ПБК ЦСКА"></a>
+    </div>
+    <div class="today">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <div>
+        <div class="today-date"></div>
+        <div class="today-weekday"></div>
+      </div>
+    </div>
+    <button type="button" id="theme" class="theme" aria-pressed="true">
+      <span class="track" aria-hidden="true"><span class="knob"></span></span>
+      <span class="theme-label">Тёмная</span>
+    </button>
   </header>
   <main>
-    <div class="toolbar">
-      <div class="group" id="sports">
-        <button type="button" data-sport="football" aria-pressed="true">Футбол</button>
-        <button type="button" data-sport="hockey" aria-pressed="true">Хоккей</button>
-        <button type="button" data-sport="basketball" aria-pressed="true">Баскетбол</button>
-      </div>
-      <div class="group" id="sides">
-        <button type="button" data-side="home" aria-pressed="true">Дома</button>
-        <button type="button" data-side="away" aria-pressed="true">Выезд</button>
-      </div>
-    </div>
     <div class="nav">
-      <button type="button" id="prev">← месяц</button>
-      <h2 id="label"></h2>
-      <button type="button" id="next">месяц →</button>
+      <div class="months">
+        <button type="button" id="prev">← месяц</button>
+        <h2 id="label"></h2>
+        <button type="button" id="next">месяц →</button>
+      </div>
     </div>
-    <p id="status"></p>
+    <div class="meta">
+      <p id="status"></p>
+      <div class="group" id="sides">
+        <button type="button" data-side="home" aria-pressed="true" aria-label="Дома"><img src="icons/side-home.png?v=3" alt=""></button>
+        <button type="button" data-side="away" aria-pressed="true" aria-label="Выезд"><img src="icons/side-away.png?v=3" alt=""></button>
+      </div>
+      <p id="updated">Загрузка…</p>
+    </div>
     <div class="wrap">
       <div class="grid" id="grid"></div>
     </div>
@@ -201,6 +427,16 @@
     let matches = [];
     let cursor = todayParts();
 
+    showToday();
+
+    const themeButton = document.getElementById("theme");
+    applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+    themeButton.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      applyTheme(next);
+      try { localStorage.setItem("cska-theme", next); } catch (error) {}
+    });
+
     document.getElementById("sports").addEventListener("click", (event) => toggle(event, sports, "sport"));
     document.getElementById("sides").addEventListener("click", (event) => toggle(event, sides, "side"));
     document.getElementById("prev").addEventListener("click", () => shift(-1));
@@ -222,6 +458,23 @@
       .catch(() => {
         document.getElementById("updated").textContent = "Нет matches.json. Сначала запустите python -m cska";
       });
+
+    function showToday() {
+      const date = new Date();
+      const zone = { timeZone: "Europe/Moscow" };
+      const parts = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric", ...zone }).formatToParts(date);
+      const value = (type) => parts.find((part) => part.type === type).value;
+      document.querySelector(".today-date").textContent = value("day") + " " + value("month") + " " + value("year");
+      const weekday = new Intl.DateTimeFormat("ru-RU", { weekday: "long", ...zone }).format(date);
+      document.querySelector(".today-weekday").textContent = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+    }
+
+    function applyTheme(theme) {
+      const dark = theme === "dark";
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      themeButton.setAttribute("aria-pressed", dark ? "true" : "false");
+      themeButton.querySelector(".theme-label").textContent = dark ? "Тёмная" : "Светлая";
+    }
 
     function toggle(event, bag, attr) {
       const button = event.target.closest("button");
@@ -298,11 +551,10 @@
       link.rel = "noreferrer";
       const lines = [
         emblem(match),
-        opponentLine(match),
-        clubPlace(match),
+        titleBlock(match),
         scoreLine(match),
         sideLine(match),
-        textLine("sub", match.venue || "арена не указана"),
+        venueLine(match),
         footLine(match),
       ];
       link.append(...lines.filter(Boolean));
@@ -316,6 +568,13 @@
       return icon;
     }
 
+    function titleBlock(match) {
+      const node = document.createElement("div");
+      node.className = "title";
+      node.append(opponentLine(match), clubPlace(match));
+      return node;
+    }
+
     function opponentLine(match) {
       const node = document.createElement("div");
       node.className = "opp";
@@ -324,10 +583,9 @@
     }
 
     function clubPlace(match) {
-      if (!match.club_place) return null;
       const node = document.createElement("div");
       node.className = "club-place";
-      node.textContent = "(" + match.club_place + ")";
+      node.textContent = match.club_place ? "(" + match.club_place + ")" : "";
       return node;
     }
 
@@ -383,6 +641,12 @@
       }
       node.className = "side " + (match.home_away === "home" ? "side-home" : "side-away");
       node.textContent = label;
+      return node;
+    }
+
+    function venueLine(match) {
+      const node = textLine("sub", match.venue || "арена не указана");
+      node.title = node.textContent;
       return node;
     }
 
