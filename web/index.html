@@ -336,6 +336,7 @@
       }
     }
     .match {
+      --match-line-gap: 14.4px;
       display: block;
       position: relative;
       text-decoration: none;
@@ -387,8 +388,11 @@
     }
     .match .score { font-size: 13px; font-weight: 700; line-height: 1.2; height: 1.2em; }
     .match .score-pending { color: var(--muted); font-weight: 650; }
-    /* Отступы между строками после счёта улучшают читаемость на всех экранах. */
-    .match > .side, .match > .sub, .match > .time, .match > .foot {
+    /* Пустая строка после «Дома/Выезд» и перед соревнованием на всех экранах. */
+    .match > .sub, .match > .foot {
+      margin-top: var(--match-line-gap);
+    }
+    .match > .side, .match > .time {
       margin-top: 3px;
     }
     .match .side {
@@ -436,6 +440,27 @@
     .score-win { color: var(--score-win); }
     .score-loss { color: var(--score-loss); }
     .score-draw { color: var(--score-draw); }
+    @media (max-width: 760px) {
+      /* Удваиваем шрифт карточек; высота и переносы сохраняют весь крупный текст. */
+      .match { --match-line-gap: 28.8px; }
+      .match .opp, .match .score { font-size: 26px; }
+      .match .side, .match .sub, .match .club-place, .match .time { font-size: 24px; }
+      .match .comp, .match .sport { font-size: 22px; }
+      .match .title, .match .opp, .match .score, .match .side,
+      .match .sub, .match .club-place, .match .time, .match .foot {
+        height: auto;
+        max-height: none;
+        line-height: 1.2;
+        overflow: visible;
+      }
+      .match .side, .match .side-text, .match .sub, .match .comp {
+        white-space: normal;
+        overflow: visible;
+      }
+      .match .title { min-height: 91.2px; }
+      .match > .side, .match > .time { margin-top: 6px; }
+      .match .foot { flex-wrap: wrap; gap: 6px 12px; }
+    }
     footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
     footer a { color: var(--hockey); }
   </style>
