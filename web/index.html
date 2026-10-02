@@ -386,8 +386,9 @@
       max-height: 31.2px;
       overflow: hidden;
     }
-    .match .score { font-size: 13px; font-weight: 700; line-height: 1.2; height: 1.2em; }
-    .match .score-pending { color: var(--muted); font-weight: 650; }
+    /* Счёт жирный и на 2 px крупнее основного текста с названием соперника. */
+    .match .score { font-size: 15px; font-weight: 700; line-height: 1.2; height: 1.2em; }
+    .match .score-pending { color: var(--muted); }
     /* Пустая строка после «Дома/Выезд» и перед соревнованием на всех экранах. */
     .match > .sub, .match > .foot {
       margin-top: var(--match-line-gap);
@@ -443,7 +444,8 @@
     @media (max-width: 760px) {
       /* Удваиваем шрифт карточек; высота и переносы сохраняют весь крупный текст. */
       .match { --match-line-gap: 28.8px; }
-      .match .opp, .match .score { font-size: 26px; }
+      .match .opp { font-size: 26px; }
+      .match .score { font-size: 28px; }
       .match .side, .match .sub, .match .club-place, .match .time { font-size: 24px; }
       .match .comp, .match .sport { font-size: 22px; }
       .match .title, .match .opp, .match .score, .match .side,
@@ -457,7 +459,11 @@
         white-space: normal;
         overflow: visible;
       }
-      .match .title { min-height: 91.2px; }
+      /* Дата и эмблема вдвое крупнее; оставляем место для эмблемы рядом с названием. */
+      .daynum { font-size: 24px; }
+      .match .icon { width: 56px; height: 56px; }
+      .match .icon img { height: 56px; }
+      .match .title { min-height: 91.2px; padding-right: 28px; }
       .match > .side, .match > .time { margin-top: 6px; }
       .match .foot { flex-wrap: wrap; gap: 6px 12px; }
     }
