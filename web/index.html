@@ -62,7 +62,7 @@
       grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 4px;
     }
-    .match { overflow-wrap: anywhere; }
+    .match { overflow-wrap: break-word; }
     @media (max-width: 760px) {
       .weekday { display: none; }
       .grid { grid-template-columns: 1fr; }
@@ -95,24 +95,33 @@
     .cell.today .daynum { color: var(--red); }
     .match {
       display: block;
+      position: relative;
       text-decoration: none;
       color: inherit;
       border-left: 3px solid var(--football);
       background: #faf7f2;
       border-radius: 4px;
-      padding: 4px 6px 5px;
+      padding: 4px 36px 5px 6px;
       margin-top: 4px;
     }
+    .match.local { background: #e5f7e8; }
     .match.hockey { border-left-color: var(--hockey); }
     .match.basketball { border-left-color: var(--basketball); }
     .match .sport {
-      display: flex;
-      align-items: center;
-      gap: 5px;
       font-size: 13px;
       font-weight: 700;
+      text-align: left;
     }
-    .match .icon { width: 28px; height: 28px; display: inline-flex; flex: none; align-items: center; justify-content: center; }
+    .match .icon {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
     .match .icon img { height: 28px; width: auto; display: block; }
     .match .opp { font-size: 13px; font-weight: 650; }
     .match .side { font-size: 12px; font-weight: 700; }
@@ -258,11 +267,13 @@
 
     function card(match) {
       const link = document.createElement("a");
-      link.className = "match " + match.sport;
+      const inMoscow = (match.home_away_label || "").includes("(Москва)");
+      link.className = "match " + match.sport + (match.home_away === "home" || inMoscow ? " local" : "");
       link.href = match.source_url;
       link.target = "_blank";
       link.rel = "noreferrer";
       link.append(
+        emblem(match),
         sportLine(match),
         opponentLine(match),
         sideLine(match),
@@ -272,15 +283,17 @@
       return link;
     }
 
-    function sportLine(match) {
-      const row = document.createElement("div");
-      row.className = "sport";
-      const name = document.createElement("span");
-      name.textContent = match.sport_label;
+    function emblem(match) {
       const icon = document.createElement("span");
       icon.className = "icon";
       icon.innerHTML = ICONS[match.sport] || "";
-      row.append(icon, name);
+      return icon;
+    }
+
+    function sportLine(match) {
+      const row = document.createElement("div");
+      row.className = "sport";
+      row.textContent = match.sport_label;
       return row;
     }
 
