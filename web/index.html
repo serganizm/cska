@@ -605,7 +605,10 @@
       const lead = (first.getDay() + 6) % 7;
       const days = new Date(cursor.year, cursor.month, 0).getDate();
       const today = todayKey();
-      const visible = matches.filter((match) => sports.has(match.sport) && sides.has(match.home_away));
+      // Выезды в Москве также показываем при включённом фильтре домашних матчей.
+      const visible = matches.filter((match) => sports.has(match.sport) && (
+        sides.has(match.home_away) || (sides.has("home") && isMoscowAway(match))
+      ));
       const slots = Math.ceil((lead + days) / 7) * 7;
       const gridStart = dateKey(new Date(cursor.year, cursor.month - 1, 1 - lead));
       const gridEnd = dateKey(new Date(cursor.year, cursor.month - 1, slots - lead));
@@ -643,9 +646,13 @@
       }
     }
 
+    function isMoscowAway(match) {
+      return match.home_away === "away" && (match.home_away_label || "").includes("(Москва)");
+    }
+
     function card(match) {
       const link = document.createElement("a");
-      const inMoscow = (match.home_away_label || "").includes("(Москва)");
+      const inMoscow = isMoscowAway(match);
       link.className = "match " + match.sport + (match.home_away === "home" || inMoscow ? " local" : "");
       link.href = match.source_url;
       link.target = "_blank";
