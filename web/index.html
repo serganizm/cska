@@ -32,6 +32,8 @@
       --side-home: #1b7d38;
       /* Синий для выездных матчей на светлом фоне. */
       --side-away: #245b9e;
+      /* Сиреневый выделяет контрольные матчи в светлой теме. */
+      --friendly: #7750a6;
       --outside: #e7f3ff;
       --outside-num: #7a98b8;
       --match: #ffffff;
@@ -57,6 +59,8 @@
       --side-home: #4dce74;
       /* Более светлый синий сохраняет читаемость выездов в тёмной теме. */
       --side-away: #8bbcff;
+      /* Светлый сиреневый для контрольных матчей на тёмном фоне. */
+      --friendly: #c4a0f0;
       --outside: #070b11;
       --outside-num: #6e88a8;
       --match: #172331;
@@ -233,7 +237,7 @@
     }
     #sports button[aria-pressed="true"] img,
     #sides button[aria-pressed="true"] img { opacity: 1; }
-    .months { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .months { display: flex; align-items: center; justify-content: center; gap: 4px; }
     #updated {
       margin: 0;
       color: var(--muted);
@@ -264,9 +268,9 @@
       border-color: var(--nav-btn);
       color: var(--ink);
     }
-    /* Контурные стрелки переключения месяцев в прежних округлых плашках. */
-    .months button { display: inline-flex; align-items: center; justify-content: center; width: 40px; flex: none; padding: 0; }
-    .months button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+    /* Стрелки без плашек; размер области нажатия сохранён. */
+    .months button { display: inline-flex; align-items: center; justify-content: center; width: 40px; flex: none; padding: 0; background: transparent; border-color: transparent; }
+    .months button svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     #prev svg { transform: rotate(180deg); }
     #refresh:disabled { opacity: 0.6; cursor: default; }
     .wrap { overflow-x: auto; }
@@ -290,7 +294,7 @@
         padding-left: 20px;
         padding-right: 20px;
       }
-      .months { gap: 8px; }
+      .months { gap: 4px; }
       .nav h2 { white-space: nowrap; }
       .filters, .nav-actions { justify-self: center; }
       /* При прокрутке оставляем в панели фильтры и месяц, скрывая ряд действий. */
@@ -480,6 +484,7 @@
       font-weight: 400;
       color: var(--muted);
     }
+    .match .comp-friendly { color: var(--friendly); }
     .score-win { color: var(--score-win); }
     .score-loss { color: var(--score-loss); }
     .score-draw { color: var(--score-draw); }
@@ -542,9 +547,9 @@
       </div>
       <div class="month-block">
         <div class="months">
-          <button type="button" id="prev" aria-label="Предыдущий месяц"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 3h7l11 11-11 11H5l11-11Z"/></svg></button>
+          <button type="button" id="prev" aria-label="Предыдущий месяц"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg></button>
           <h2 id="label"></h2>
-          <button type="button" id="next" aria-label="Следующий месяц"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 3h7l11 11-11 11H5l11-11Z"/></svg></button>
+          <button type="button" id="next" aria-label="Следующий месяц"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg></button>
         </div>
         <p id="updated">Загрузка…</p>
       </div>
@@ -817,6 +822,7 @@
       if (kind) {
         const mark = document.createElement("span");
         mark.className = "comp";
+        if (kind === "Контрольный") mark.classList.add("comp-friendly");
         mark.textContent = kind;
         row.append(mark);
       }
