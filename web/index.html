@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Календарь ЦСКА</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --ink: #1c1916;
+      --muted: #6d675f;
+      --line: #e2d9cc;
+      --card: #fffdf9;
+      --red: #b11218;
+      --football: #b11218;
+      --hockey: #1d4e89;
+      --basketball: #c45c12;
+      --home: #1b7d38;
+      --away: #8a6230;
+      --draw: #1a56c4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 15px/1.4 "Segoe UI", "Liberation Sans", "Nimbus Sans", sans-serif;
+    }
+    header {
+      background: var(--red);
+      color: #fff;
+      padding: 22px 24px 18px;
+    }
+    header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.01em; }
+    header p { margin: 6px 0 0; opacity: 0.9; }
+    main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
+    .toolbar, .nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .toolbar { margin-bottom: 14px; }
+    .group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .group + .group { margin-left: 8px; }
+    button {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button[aria-pressed="true"] { color: #fff; border-color: transparent; }
+    button[data-sport="football"][aria-pressed="true"] { background: var(--football); }
+    button[data-sport="hockey"][aria-pressed="true"] { background: var(--hockey); }
+    button[data-sport="basketball"][aria-pressed="true"] { background: var(--basketball); }
+    button[data-side="home"][aria-pressed="true"] { background: var(--home); }
+    button[data-side="away"][aria-pressed="true"] { background: var(--away); }
+    .nav { justify-content: space-between; margin-bottom: 10px; }
+    .nav h2 { margin: 0; font-size: 22px; text-transform: capitalize; }
+    .nav button { border-radius: 8px; }
+    .wrap { overflow-x: auto; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .match { overflow-wrap: anywhere; }
+    @media (max-width: 760px) {
+      .weekday { display: none; }
+      .grid { grid-template-columns: 1fr; }
+      .cell { min-height: 0; }
+    }
+    .weekday {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 0 6px;
+    }
+    .cell {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 108px;
+      padding: 6px;
+    }
+    .cell.outside {
+      background: #ebe6dc;
+      border-color: transparent;
+    }
+    .cell.outside .daynum { color: #b7b0a4; font-weight: 600; }
+    .cell.outside .match { opacity: 0.55; }
+    .cell.today { outline: 2px solid var(--red); }
+    .daynum { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    .cell.today .daynum { color: var(--red); }
+    .match {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-left: 3px solid var(--football);
+      background: #faf7f2;
+      border-radius: 4px;
+      padding: 4px 6px 5px;
+      margin-top: 4px;
+    }
+    .match.hockey { border-left-color: var(--hockey); }
+    .match.basketball { border-left-color: var(--basketball); }
+    .match .sport {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .match .icon { width: 28px; height: 28px; display: inline-flex; flex: none; align-items: center; justify-content: center; }
+    .match .icon img { height: 28px; width: auto; display: block; }
+    .match .opp { font-size: 13px; font-weight: 650; }
+    .match .side { font-size: 12px; font-weight: 700; }
+    .match .sub, .match .time { font-size: 12px; color: var(--muted); }
+    .match .time { font-weight: 700; color: var(--ink); }
+    .side-home, .side-moscow { color: var(--home); }
+    .side-away { color: var(--away); }
+    .score-win { color: var(--home); }
+    .score-loss { color: var(--red); }
+    .score-draw { color: var(--draw); }
+    #status { color: var(--muted); }
+    footer { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    footer a { color: var(--hockey); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Календарь ЦСКА</h1>
+    <p id="updated">Загрузка…</p>
+  </header>
+  <main>
+    <div class="toolbar">
+      <div class="group" id="sports">
+        <button type="button" data-sport="football" aria-pressed="true">Футбол</button>
+        <button type="button" data-sport="hockey" aria-pressed="true">Хоккей</button>
+        <button type="button" data-sport="basketball" aria-pressed="true">Баскетбол</button>
+      </div>
+      <div class="group" id="sides">
+        <button type="button" data-side="home" aria-pressed="true">Дома</button>
+        <button type="button" data-side="away" aria-pressed="true">Выезд</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button type="button" id="prev">← месяц</button>
+      <h2 id="label"></h2>
+      <button type="button" id="next">месяц →</button>
+    </div>
+    <p id="status"></p>
+    <div class="wrap">
+      <div class="grid" id="grid"></div>
+    </div>
+    <footer>
+      Источники:
+      <a href="https://pfc-cska.com/ru/matchi/kalendar-matchej/">ПФК ЦСКА</a>,
+      <a href="https://cska-hockey.ru/calendar/">ХК ЦСКА</a>,
+      <a href="https://cskabasket.ru/schedule/?all=Y">ПБК ЦСКА</a>.
+      Файл для календаря телефона: <a href="calendar.ics">calendar.ics</a>.
+    </footer>
+  </main>
+  <script>
+    const ICONS = {
+      football: '<img src="icons/football.svg" alt="">',
+      hockey: '<img src="icons/hockey.svg" alt="">',
+      basketball: '<img src="icons/basketball.svg" alt="">',
+    };
+    const MONTHS = ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+    const WEEKDAYS = ["пн","вт","ср","чт","пт","сб","вс"];
+    const sports = new Set(["football","hockey","basketball"]);
+    const sides = new Set(["home","away"]);
+    let matches = [];
+    let cursor = todayParts();
+
+    document.getElementById("sports").addEventListener("click", (event) => toggle(event, sports, "sport"));
+    document.getElementById("sides").addEventListener("click", (event) => toggle(event, sides, "side"));
+    document.getElementById("prev").addEventListener("click", () => shift(-1));
+    document.getElementById("next").addEventListener("click", () => shift(1));
+
+    fetch("matches.json", { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then((payload) => {
+        matches = payload.matches || [];
+        const updated = payload.updated_at ? new Date(payload.updated_at) : null;
+        document.getElementById("updated").textContent = updated
+          ? "Обновлено " + updated.toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })
+          : "Календарь собран";
+        render();
+      })
+      .catch(() => {
+        document.getElementById("updated").textContent = "Нет matches.json. Сначала запустите python -m cska";
+      });
+
+    function toggle(event, bag, attr) {
+      const button = event.target.closest("button");
+      if (!button) return;
+      const value = button.dataset[attr];
+      if (bag.has(value)) bag.delete(value);
+      else bag.add(value);
+      button.setAttribute("aria-pressed", bag.has(value) ? "true" : "false");
+      render();
+    }
+
+    function shift(delta) {
+      const date = new Date(Date.UTC(cursor.year, cursor.month - 1 + delta, 1));
+      cursor = { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1 };
+      render();
+    }
+
+    function render() {
+      const label = document.getElementById("label");
+      label.textContent = MONTHS[cursor.month - 1] + " " + cursor.year;
+      const grid = document.getElementById("grid");
+      grid.replaceChildren();
+      for (const name of WEEKDAYS) {
+        const cell = document.createElement("div");
+        cell.className = "weekday";
+        cell.textContent = name;
+        grid.append(cell);
+      }
+      const first = new Date(cursor.year, cursor.month - 1, 1);
+      const lead = (first.getDay() + 6) % 7;
+      const days = new Date(cursor.year, cursor.month, 0).getDate();
+      const today = todayKey();
+      const visible = matches.filter((match) => sports.has(match.sport) && sides.has(match.home_away));
+      const slots = Math.ceil((lead + days) / 7) * 7;
+      const gridStart = dateKey(new Date(cursor.year, cursor.month - 1, 1 - lead));
+      const gridEnd = dateKey(new Date(cursor.year, cursor.month - 1, slots - lead));
+      let shown = 0;
+      for (let index = 0; index < slots; index += 1) {
+        const date = new Date(cursor.year, cursor.month - 1, 1 - lead + index);
+        const key = dateKey(date);
+        const outside = date.getMonth() !== cursor.month - 1;
+        const cell = document.createElement("div");
+        cell.className = "cell" + (outside ? " outside" : "");
+        if (key === today) cell.classList.add("today");
+        const num = document.createElement("div");
+        num.className = "daynum";
+        num.textContent = String(date.getDate());
+        cell.append(num);
+        for (const match of visible) {
+          if (placeKey(match, gridStart, gridEnd) !== key) continue;
+          if (!outside) shown += 1;
+          cell.append(card(match));
+        }
+        grid.append(cell);
+      }
+      document.getElementById("status").textContent = shown
+        ? "Матчей в этом месяце: " + shown
+        : "В этом месяце по выбранным фильтрам матчей нет";
+    }
+
+    function card(match) {
+      const link = document.createElement("a");
+      link.className = "match " + match.sport;
+      link.href = match.source_url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.append(
+        sportLine(match),
+        opponentLine(match),
+        sideLine(match),
+        textLine("sub", match.venue || "арена не указана"),
+        textLine("time", match.time_label || "не определено"),
+      );
+      return link;
+    }
+
+    function sportLine(match) {
+      const row = document.createElement("div");
+      row.className = "sport";
+      const name = document.createElement("span");
+      name.textContent = match.sport_label;
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.innerHTML = ICONS[match.sport] || "";
+      row.append(icon, name);
+      return row;
+    }
+
+    function opponentLine(match) {
+      const node = document.createElement("div");
+      node.className = "opp";
+      node.append(document.createTextNode(match.opponent));
+      if (!match.score) return node;
+      const score = document.createElement("span");
+      const kind = match.result || scoreKind(match.score);
+      if (kind) score.className = "score-" + kind;
+      score.textContent = " " + match.score;
+      node.append(score);
+      return node;
+    }
+
+    function scoreKind(score) {
+      const parts = String(score).split(":");
+      if (parts.length !== 2 || !/^\d+$/.test(parts[0]) || !/^\d+$/.test(parts[1])) return "";
+      const ours = Number(parts[0]);
+      const theirs = Number(parts[1]);
+      if (ours > theirs) return "win";
+      if (ours < theirs) return "loss";
+      return "draw";
+    }
+
+    function sideLine(match) {
+      const node = document.createElement("div");
+      const label = match.home_away_label || "";
+      const moscow = " (Москва)";
+      if (label.endsWith(moscow)) {
+        node.className = "side side-away";
+        node.append(document.createTextNode(label.slice(0, -moscow.length) + " "));
+        const city = document.createElement("span");
+        city.className = "side-moscow";
+        city.textContent = "(Москва)";
+        node.append(city);
+        return node;
+      }
+      node.className = "side " + (match.home_away === "home" ? "side-home" : "side-away");
+      node.textContent = label;
+      return node;
+    }
+
+    function textLine(className, value) {
+      const node = document.createElement("div");
+      node.className = className;
+      node.textContent = value;
+      return node;
+    }
+
+    function placeKey(match, gridStart, gridEnd) {
+      const from = match.starts_at ? match.starts_at.slice(0, 10) : match.date_from;
+      const to = match.starts_at ? from : (match.date_to || match.date_from);
+      if (!from || !to || to < gridStart || from > gridEnd) return "";
+      return from < gridStart ? gridStart : from;
+    }
+
+    function dateKey(date) {
+      return iso(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    }
+
+    function iso(year, month, day) {
+      return year + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+    }
+
+    function todayParts() {
+      const key = todayKey();
+      const [year, month] = key.split("-").map(Number);
+      return { year, month };
+    }
+
+    function todayKey() {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+    }
+  </script>
+</body>
+</html>

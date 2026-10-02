@@ -1,0 +1,8 @@
+[Unit]
+Description=Обновление календаря матчей ЦСКА
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/sergey/Projects/cska
+EnvironmentFile=-/home/sergey/Projects/cska/.env
+ExecStart=/home/sergey/Projects/cska/.venv/bin/python -m cska
